@@ -1,0 +1,12 @@
+-- BlackDragon :: Hammerspoon Init
+require('modules.windows')
+require('modules.hotkeys')
+require('modules.apps')
+require('modules.n8n')
+require('modules.clipboard')
+
+hs.pathwatcher.new(os.getenv('HOME') .. '/.hammerspoon/', function()
+  hs.reload()
+end):start()
+
+hs.alert.show('✅ Hammerspoon reloaded')

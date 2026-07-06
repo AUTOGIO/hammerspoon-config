@@ -1,0 +1,22 @@
+# .cursorrules for Hammerspoon config
+project: Hammerspoon macOS Automation
+language: Lua
+editor: Cursor
+context:
+  - Entry point is init.lua, modules live in /modules
+  - hs.* is the Hammerspoon global API namespace
+  - Do not use require() with .lua extension
+  - LuaJIT runtime
+style:
+  - Keep each module focused on one responsibility
+  - Always include error handling in hs.http calls
+  - Use hs.logger for persistent logs
+integrations:
+  - n8n webhooks via hs.http.asyncGet/asyncPost
+  - AppleScript via hs.osascript.applescript()
+  - Keyboard Maestro via hs.urlevent.openURL()
+  - macOS notifications via hs.notify (async feedback without blocking)
+  - MQTT / IoT via hs.mqtt (smart home, sensors)
+  - WebSockets via hs.websocket (live dashboards, chat bots)
+  - Network discovery via hs.network, hs.host
+  - Calendar / Reminders via AppleScript or Shortcuts (scheduling hooks)
