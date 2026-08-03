@@ -1,6 +1,6 @@
 # BlackDragon Operations Console
 
-Phase 1 local operations dashboard for the Hammerspoon BlackDragon automation stack.
+Phase 4 local operations dashboard for the Hammerspoon BlackDragon automation stack (live status, diagnostics, insight metrics).
 
 ## Architecture
 
@@ -12,7 +12,7 @@ runtime/operations_events.json
     ↑ atomic write
 modules/operations_console.lua
     ↓ allowlisted actions only
-existing modules (layouts, windows, terminal_ops, verify, guide, …)
+modules (layouts, verify, diagnostics, insight, guide, …)
 ```
 
 Browser actions use a **separate** URL scheme from the legacy guide bridge:
@@ -34,7 +34,10 @@ No localhost server is required. Status is read via relative `fetch()` from the 
 | Path | Role |
 |------|------|
 | `modules/operations_console.lua` | Status engine, event log, URL handler |
-| `runtime/operations_status.json` | Live health snapshot |
+| `modules/diagnostics.lua` | Named PASS/FAIL/WARNING diagnostics + environment audit |
+| `modules/verify.lua` | Layout verify + `runFull()` stack self-test |
+| `modules/insight.lua` | Hotkey scan, thin host metrics, light perf probes |
+| `runtime/operations_status.json` | Live health snapshot (+ last suite / insight results) |
 | `runtime/operations_events.json` | Bounded event stream (max 200) |
 | `docs/USER_GUIDE.html` | Operations Console UI + preserved guide |
 | `init.lua` | Starts console on load |
@@ -43,18 +46,25 @@ No localhost server is required. Status is read via relative `fetch()` from the 
 
 Top-level fields:
 
-- `schema_version` — integer schema revision (`2` for this phase)
+- `schema_version` — integer schema revision (`2`)
 - `generated_at` — ISO-like local timestamp
-- `overall` — `{ status, score, last_error }` where status is `HEALTHY`, `DEGRADED`, `CRITICAL`, or `UNKNOWN`
+- `overall` — `{ status, score, last_error }` where status is `HEALTHY`, `DEGRADED`, `CRITICAL`, or `UNKNOWN` (from 30s live poll only)
 - `hammerspoon` — runtime, accessibility, screens
 - `services` — `ghostty`, `ollama`, `n8n`, `lm_studio`, `openclaw`, `project`
 - `displays` — screen list, auto-tile, active layout
 - `modules` — load health per module
+- `clipboard` — `{ history_count, watcher_alive }`
+- `diagnostics` — last `run_diagnostics` payload (`at`, `score`, `pass`, `fail`, `warn`, `checks[]`)
+- `environment` — last `run_environment_audit` payload (+ `issues[]`)
+- `verification` — last `run_full_self_test` payload
+- `system` — thin host metrics from `insight.hostMetrics()` (CPU/mem/battery/load; refreshed each status write)
+- `hotkeys` — last `run_hotkey_scan` payload (HS-only inventory + duplicate chords)
+- `metrics` — last `run_perf_probes` payload (`probes[]` with timings)
 - `diagnostics_text` — copy-ready summary
 
 Individual check failures do not abort the full refresh.
 
-Scoring rule: Hammerspoon, accessibility, Ghostty config/runtime, project path, and core modules are required. `ollama`, `n8n`, `lm_studio`, and `openclaw` are warn-only and do not need to be healthy for the console to stay out of `CRITICAL`.
+Scoring rule: Hammerspoon, accessibility, Ghostty config/runtime, project path, and core modules are required. `ollama`, `n8n`, `lm_studio`, and `openclaw` are warn-only and do not need to be healthy for the console to stay out of `CRITICAL`. Suite scores and insight snapshots (`diagnostics` / `environment` / `verification` / `hotkeys` / `metrics`) are **not** recomputed by the 30s poll (results are preserved across refreshes). Host `system` metrics are cheap and refreshed on each write.
 
 ## Action allowlist
 
@@ -68,7 +78,13 @@ Scoring rule: Hammerspoon, accessibility, Ghostty config/runtime, project path, 
 | `apply_ops_layout` | `layouts.apply('ops')` |
 | `apply_writing_layout` | `layouts.apply('writing')` |
 | `toggle_auto_tile` | `windows.toggleAutoTile()` |
-| `run_verification` | `verify.run()` |
+| `run_verification` | `verify.run()` layout/display suite |
+| `run_diagnostics` | `diagnostics.runDiagnostics()` → `status.diagnostics` |
+| `run_environment_audit` | `diagnostics.runEnvironmentAudit()` → `status.environment` |
+| `run_full_self_test` | `verify.runFull()` → `status.verification` |
+| `run_hotkey_scan` | `insight.scanHotkeys()` → `status.hotkeys` (HS duplicates only) |
+| `run_perf_probes` | `insight.runPerfProbes()` → `status.metrics` |
+| `backup_configuration` | Dated archive under `~/.hammerspoon/backups/ops-YYYYMMDD-HHMMSS/` |
 | `open_guide` | `guide.open()` |
 | `open_hammerspoon_folder` | Finder → `~/.hammerspoon` |
 | `open_project_folder` | Finder → BlackDragon project |
@@ -78,8 +94,11 @@ Scoring rule: Hammerspoon, accessibility, Ghostty config/runtime, project path, 
 | `open_event_log` | Open `runtime/operations_events.json` |
 | `clear_event_display` | Clears console event JSON only |
 | `open_hammerspoon_console` | Focus Hammerspoon / open console if supported |
+| `ai_prompt` | Allowlisted prompt id → `ai.lua` |
 
 Unknown actions are rejected and logged as warnings. No arbitrary shell commands, paths, or Lua expressions are accepted from the browser.
+
+Hotkey scan scope: **Hammerspoon registrations only**. macOS, Raycast, and Cursor shortcut collisions are out of band.
 
 ## Refresh behavior
 

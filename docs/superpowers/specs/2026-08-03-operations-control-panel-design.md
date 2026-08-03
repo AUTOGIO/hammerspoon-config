@@ -332,4 +332,4 @@ Stale warning behavior (≥30s) remains.
 
 ## 14. Next step after approval
 
-Implement **Phase 0a + 0b + Phase 1** per `docs/superpowers/plans/2026-08-03-ops-phase0-phase1.md`. Phases 2–5 get their own implementation plans when started.
+Phases 0–4 implemented. Optional next: Phase 5 stretch (workflow recorder / documentation auto-generator) only if docs drift or workflow authoring remains top pain.

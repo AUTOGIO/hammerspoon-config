@@ -330,7 +330,38 @@
       color: var(--text); font-family: var(--font); font-size: 0.9rem; outline: none;
     }
     .search-wrap input:focus { border-color: var(--accent); }
-    .search-wrap { margin-bottom: 1.25rem; }
+    .search-wrap { margin-bottom: 1.25rem; position: relative; }
+    .global-search-results {
+      position: absolute; z-index: 20; left: 0; right: 0; top: calc(100% - 0.5rem);
+      max-height: 280px; overflow: auto;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+    }
+    .global-search-results button {
+      display: block; width: 100%; text-align: left; background: transparent; border: 0;
+      border-bottom: 1px solid var(--border); color: var(--text); padding: 0.65rem 0.85rem;
+      cursor: pointer; font: inherit;
+    }
+    .global-search-results button:hover { background: var(--surface2); }
+    .global-search-results .gs-cat { color: var(--muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    .global-search-results .gs-title { font-size: 0.88rem; }
+    .ops-source-badge {
+      display: inline-block; font-size: 0.68rem; padding: 0.1rem 0.35rem; border-radius: 999px;
+      border: 1px solid var(--border); color: var(--muted); margin-right: 0.25rem;
+    }
+    .prompt-library { display: grid; grid-template-columns: minmax(180px, 240px) 1fr; gap: 1rem; }
+    @media (max-width: 800px) { .prompt-library { grid-template-columns: 1fr; } }
+    .prompt-library-list { display: flex; flex-direction: column; gap: 0.35rem; }
+    .prompt-library-list button {
+      text-align: left; background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+      color: var(--text); padding: 0.55rem 0.7rem; cursor: pointer; font: inherit;
+    }
+    .prompt-library-list button.active { border-color: var(--accent); color: var(--accent); }
+    .prompt-preview-body {
+      white-space: pre-wrap; font-family: var(--mono); font-size: 0.8rem; line-height: 1.45;
+      background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem; max-height: 280px; overflow: auto;
+    }
+
 
     .module-tag {
       display: inline-block; background: var(--surface3);
@@ -488,6 +519,98 @@
       white-space: pre-wrap; line-height: 1.5;
     }
     .ops-diagnostics-actions { margin-top: 0.45rem; display: flex; gap: 0.4rem; flex-wrap: wrap; }
+    .ops-suite-results {
+      display: grid;
+      gap: 0.75rem;
+      margin-bottom: 0.5rem;
+    }
+    .ops-suite-card {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.75rem 0.9rem;
+      background: var(--bg);
+    }
+    .ops-suite-card h4 {
+      margin: 0 0 0.35rem;
+      font-size: 0.95rem;
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .ops-suite-meta { color: var(--muted); font-size: 0.8rem; margin-bottom: 0.45rem; }
+    .ops-suite-checks { list-style: none; margin: 0; padding: 0; font-family: var(--mono); font-size: 0.78rem; }
+    .ops-suite-checks li {
+      display: grid;
+      grid-template-columns: 5.5rem 1fr;
+      gap: 0.4rem;
+      padding: 0.2rem 0;
+      border-top: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+    }
+    .ops-suite-checks li:first-child { border-top: 0; }
+    .ops-check-PASS { color: var(--green); }
+    .ops-check-FAIL { color: var(--red); }
+    .ops-check-WARNING { color: var(--amber); }
+    .ops-suite-issues { margin: 0.4rem 0 0; padding-left: 1.1rem; font-size: 0.85rem; color: var(--muted); }
+
+    .ops-insight-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 0.85rem;
+      margin-bottom: 0.75rem;
+    }
+    @media (max-width: 900px) {
+      .ops-insight-grid { grid-template-columns: 1fr; }
+    }
+    .ops-insight-panel {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.75rem 0.9rem;
+      background: var(--bg);
+    }
+    .ops-insight-panel h4 {
+      margin: 0 0 0.45rem;
+      font-size: 0.95rem;
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .ops-insight-note { color: var(--muted); font-size: 0.78rem; margin: 0 0 0.55rem; }
+    .ops-arch {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.35rem 0.25rem;
+      font-size: 0.78rem;
+    }
+    .ops-arch-node {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.35rem 0.55rem;
+      background: color-mix(in srgb, var(--surface) 80%, transparent);
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .ops-arch-node.ok { border-color: color-mix(in srgb, var(--green) 55%, var(--border)); color: var(--green); }
+    .ops-arch-node.warn { border-color: color-mix(in srgb, var(--amber) 55%, var(--border)); color: var(--amber); }
+    .ops-arch-node.bad { border-color: color-mix(in srgb, var(--red) 55%, var(--border)); color: var(--red); }
+    .ops-arch-arrow { color: var(--muted); opacity: 0.7; padding: 0 0.1rem; }
+    .ops-metrics-list, .ops-hotkey-list {
+      list-style: none; margin: 0; padding: 0;
+      font-family: var(--mono); font-size: 0.78rem;
+    }
+    .ops-metrics-list li, .ops-hotkey-list li {
+      display: grid;
+      grid-template-columns: 8.5rem 1fr;
+      gap: 0.4rem;
+      padding: 0.22rem 0;
+      border-top: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+    }
+    .ops-metrics-list li:first-child, .ops-hotkey-list li:first-child { border-top: 0; }
+    .ops-hotkey-conflict { color: var(--amber); }
+    .ops-insight-actions { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.55rem; }
+
     @media (max-width: 720px) {
       .ops-event-row { grid-template-columns: 1fr; gap: 0.15rem; }
       .ops-console { padding: 1rem; }
@@ -719,14 +842,47 @@
         <button type="button" class="ops-filter-btn" data-filter="errors">Errors</button>
         <button type="button" class="ops-filter-btn" data-filter="warnings">Warnings</button>
         <button type="button" class="ops-filter-btn" data-filter="actions">Actions</button>
+        <button type="button" class="ops-filter-btn" data-filter="source-operations">Ops</button>
+        <button type="button" class="ops-filter-btn" data-filter="source-diagnostics">Suites</button>
       </div>
       <div class="ops-events-list" id="ops-events-list" aria-live="polite"></div>
+    </div>
+
+    <div class="ops-section-title">Suite Results</div>
+    <div class="ops-suite-results" id="ops-suite-results" aria-live="polite">Run Diagnostics, Environment Audit, or Full Self-Test to populate results.</div>
+
+    <div class="ops-section-title">Insight</div>
+    <div class="ops-insight-grid" id="ops-insight" aria-live="polite">
+      <div class="ops-insight-panel">
+        <h4>Architecture <span id="ops-arch-stamp">—</span></h4>
+        <p class="ops-insight-note">Static map lit from live status (not a process browser).</p>
+        <div class="ops-arch" id="ops-arch-map"></div>
+      </div>
+      <div class="ops-insight-panel">
+        <h4>Host metrics <span id="ops-system-stamp">—</span></h4>
+        <ul class="ops-metrics-list" id="ops-system-metrics"></ul>
+        <h4 style="margin-top:0.75rem">Perf probes <span id="ops-metrics-stamp">—</span></h4>
+        <ul class="ops-metrics-list" id="ops-perf-probes"></ul>
+        <div class="ops-insight-actions">
+          <button type="button" class="ops-action-btn" data-ops-action="run_perf_probes">Run Perf Probes</button>
+        </div>
+      </div>
+      <div class="ops-insight-panel" style="grid-column: 1 / -1">
+        <h4>Hotkey scan <span id="ops-hotkeys-stamp">—</span></h4>
+        <p class="ops-insight-note">Hammerspoon registrations only — does not detect macOS, Raycast, or Cursor collisions.</p>
+        <ul class="ops-hotkey-list" id="ops-hotkey-conflicts"></ul>
+        <div class="ops-insight-actions">
+          <button type="button" class="ops-action-btn" data-ops-action="run_hotkey_scan">Scan Hotkeys</button>
+        </div>
+      </div>
     </div>
 
     <div class="ops-section-title">Diagnostics Summary</div>
     <div class="ops-diagnostics" id="ops-diagnostics">Loading…</div>
     <div class="ops-diagnostics-actions">
       <button type="button" class="ops-action-btn" data-ops-action="copy_diagnostics">Copy diagnostics</button>
+      <button type="button" class="ops-action-btn" data-ops-action="backup_configuration">Backup Configuration</button>
+      <button type="button" class="ops-action-btn" id="export-guide-prefs-btn">Export guide prefs</button>
       <button type="button" class="ops-action-btn" data-ops-action="open_event_log">Open event log</button>
       <button type="button" class="ops-action-btn" data-ops-action="clear_event_display">Clear event display</button>
     </div>
@@ -781,6 +937,7 @@
   <button data-tab="walkthrough" role="tab" onclick="scrollToWalkthrough()">Walkthrough</button>
   <button class="active" data-tab="start" role="tab">Start Here</button>
   <button data-tab="hotkeys" role="tab">Hotkeys</button>
+  <button data-tab="prompts" role="tab">AI Prompts</button>
   <button data-tab="layouts" role="tab">Layouts</button>
   <button data-tab="tips" role="tab">Pro Tips</button>
   <button data-tab="workflows" role="tab">Workflows</button>
@@ -855,10 +1012,30 @@
     <h2>Hotkey Reference</h2>
     <p class="section-lead">Click any row to run the action live. Use <strong>+ Add</strong> / <strong>×</strong> to customize each block (saved in this browser).</p>
     <div class="search-wrap">
-      <input type="search" id="hotkey-search" placeholder="Search… snap, ghostty, clipboard, chatgpt">
+      <input type="search" id="global-search" placeholder="Search everything… hotkeys, workflows, modules, Ghostty, AI, APIs, troubleshooting">
+      <div id="global-search-results" class="global-search-results" hidden></div>
+    </div>
+    <div class="search-wrap">
+      <input type="search" id="hotkey-search" placeholder="Filter hotkeys… snap, ghostty, clipboard, chatgpt">
     </div>
 
     <div id="hotkey-blocks-root"></div>
+  </section>
+
+  </section>
+
+  <!-- AI PROMPT LIBRARY -->
+  <section id="prompts" class="panel" role="tabpanel">
+    <h2>AI Prompt Library</h2>
+    <p class="section-lead">Preview the template, then run it on your current selection (clipboard handoff to ChatGPT — nothing auto-submits).</p>
+    <div class="prompt-library">
+      <div class="prompt-library-list" id="prompt-library-list"></div>
+      <div class="prompt-library-preview card">
+        <h3 id="prompt-preview-title">Select a prompt</h3>
+        <pre id="prompt-preview-body" class="prompt-preview-body">Choose a prompt on the left to preview the template. <code>&lt;&lt;selection&gt;&gt;</code> is replaced by your selected text when you run it.</pre>
+        <button type="button" class="ops-action-btn" id="prompt-run-btn" disabled>Run on selection</button>
+      </div>
+    </div>
   </section>
 
   <!-- LAYOUTS -->
@@ -1408,13 +1585,48 @@ require('modules.windows').toggleAutoTile()</pre>
       detail: '<code>cd ~/.hammerspoon && git status && git add -A && git commit -m "ops console stable"</code>',
     },
     {
-      id: 'phase2-ready', phase: 'advance',
-      title: 'Ready for Phase 2',
-      body: 'Phase 0 and Phase 1 are complete. When health is DEGRADED or better, the next milestone is Phase 2: built-in diagnostics and self-test (verify module, guided fixes, score history). Command palette and layout recorder follow in later phases.',
-      detect: s => {
-        const st = s?.overall?.status;
-        return (st === 'HEALTHY' || st === 'DEGRADED') ? 'done' : 'pending';
-      },
+      id: 'run-diagnostics', phase: 'validate',
+      title: 'Run Diagnostics suite',
+      body: 'Named PASS/FAIL/WARNING checks for accessibility, Ghostty, project path, and optional services.',
+      detail: 'Results appear under Suite Results in the Operations Console.',
+      action: 'run_diagnostics', actionLabel: 'Run Diagnostics',
+      detect: s => (s?.diagnostics && (s.diagnostics.fail || 0) === 0) ? 'done' : 'pending',
+    },
+    {
+      id: 'run-self-test', phase: 'validate',
+      title: 'Run Full Self-Test',
+      body: 'Stack self-test including layout suite, clipboard, AI module, and service pings.',
+      detail: 'Optional services may WARN without failing the step if fail count is 0.',
+      action: 'run_full_self_test', actionLabel: 'Full Self-Test',
+      detect: s => (s?.verification && (s.verification.fail || 0) === 0) ? 'done' : 'pending',
+    },
+    {
+      id: 'run-hotkey-scan', phase: 'validate',
+      title: 'Scan Hammerspoon hotkeys',
+      body: 'Inventory HS-registered bindings and flag duplicate chords inside Hammerspoon only.',
+      detail: 'macOS / Raycast / Cursor collisions are out of band.',
+      action: 'run_hotkey_scan', actionLabel: 'Scan Hotkeys',
+      detect: s => s?.hotkeys?.at ? 'done' : 'pending',
+    },
+    {
+      id: 'run-perf-probes', phase: 'validate',
+      title: 'Run light performance probes',
+      body: 'Time Ghostty find + local service HTTP probes into status.metrics.',
+      action: 'run_perf_probes', actionLabel: 'Perf Probes',
+      detect: s => (s?.metrics?.probes || []).length > 0 ? 'done' : 'pending',
+    },
+    {
+      id: 'backup-config', phase: 'advance',
+      title: 'Create a configuration backup',
+      body: 'Snapshot Hammerspoon + Ghostty configs under ~/.hammerspoon/backups/.',
+      action: 'backup_configuration', actionLabel: 'Backup Config',
+      detect: (_, ctx) => (ctx.events || []).some(e => e.action === 'backup_configuration' && e.success) ? 'done' : 'pending',
+    },
+    {
+      id: 'phase4-ready', phase: 'advance',
+      title: 'Ready for Phase 5 (optional)',
+      body: 'Phase 4 insight is live: hotkey scan, host metrics, architecture map, and probe timings. Stretch next: workflow recorder / docs auto-gen.',
+      detect: s => (s?.hotkeys && s?.system) ? 'done' : 'pending',
     },
   ];
 
@@ -1581,6 +1793,12 @@ require('modules.windows').toggleAutoTile()</pre>
     { action: 'apply_dev_console_layout', label: 'Dev Console' },
     { action: 'toggle_auto_tile', label: 'Toggle Auto-tile' },
     { action: 'run_verification', label: 'Run Verify' },
+    { action: 'run_diagnostics', label: 'Run Diagnostics' },
+    { action: 'run_environment_audit', label: 'Environment Audit' },
+    { action: 'run_full_self_test', label: 'Full Self-Test' },
+    { action: 'run_hotkey_scan', label: 'Scan Hotkeys' },
+    { action: 'run_perf_probes', label: 'Perf Probes' },
+    { action: 'backup_configuration', label: 'Backup Config' },
     { action: 'open_hammerspoon_console', label: 'HS Console' },
     { action: 'open_hammerspoon_folder', label: 'HS Folder' },
     { action: 'open_project_folder', label: 'Project Folder' },
@@ -1599,12 +1817,20 @@ require('modules.windows').toggleAutoTile()</pre>
       .replace(/"/g, '&quot;');
   }
 
-  function buildOpsURL(action) {
-    return 'hammerspoon://operations?action=' + encodeURIComponent(action);
+  function buildOpsURL(action, extra) {
+    let url = 'hammerspoon://operations?action=' + encodeURIComponent(action);
+    if (extra && typeof extra === 'object') {
+      Object.keys(extra).forEach(k => {
+        if (extra[k] != null && extra[k] !== '') {
+          url += '&' + encodeURIComponent(k) + '=' + encodeURIComponent(String(extra[k]));
+        }
+      });
+    }
+    return url;
   }
 
-  function fireOpsAction(action, label) {
-    const url = buildOpsURL(action);
+  function fireOpsAction(action, label, extra) {
+    const url = buildOpsURL(action, extra);
     showToast('▶ ' + (label || action));
     const iframe = document.createElement('iframe');
     iframe.style.display = 'none';
@@ -1785,11 +2011,161 @@ require('modules.windows').toggleAutoTile()</pre>
     el.textContent = status.diagnostics_text || 'No diagnostics available.';
   }
 
+  function renderSuiteBlock(title, suite) {
+    if (!suite || !Array.isArray(suite.checks)) return '';
+    const checks = suite.checks.map(c => {
+      const result = c.result || '?';
+      return `<li><span class="ops-check-${escapeHtml(result)}">${escapeHtml(result)}</span><span>${escapeHtml(c.id || '')} — ${escapeHtml(c.detail || '')}</span></li>`;
+    }).join('');
+    const issues = Array.isArray(suite.issues) && suite.issues.length
+      ? `<ul class="ops-suite-issues">${suite.issues.map(i => `<li>${escapeHtml(i.result || '')}: ${escapeHtml(i.id || '')} — ${escapeHtml(i.detail || '')}</li>`).join('')}</ul>`
+      : '';
+    return `<div class="ops-suite-card">
+      <h4><span>${escapeHtml(title)}</span><span>${escapeHtml(String(suite.score ?? '—'))}/100</span></h4>
+      <div class="ops-suite-meta">${escapeHtml(suite.at || '—')} · ${escapeHtml(String(suite.pass ?? 0))} pass · ${escapeHtml(String(suite.fail ?? 0))} fail · ${escapeHtml(String(suite.warn ?? 0))} warn</div>
+      <ul class="ops-suite-checks">${checks}</ul>
+      ${issues}
+    </div>`;
+  }
+
+  function renderOpsSuites(status) {
+    const el = document.getElementById('ops-suite-results');
+    if (!el) return;
+    const blocks = [
+      renderSuiteBlock('Diagnostics', status.diagnostics),
+      renderSuiteBlock('Environment Audit', status.environment),
+      renderSuiteBlock('Full Self-Test', status.verification),
+    ].filter(Boolean);
+    el.innerHTML = blocks.length
+      ? blocks.join('')
+      : 'Run Diagnostics, Environment Audit, or Full Self-Test to populate results.';
+  }
+
+  function fmtPct(n) {
+    if (n == null || Number.isNaN(Number(n))) return '—';
+    return Number(n).toFixed(1) + '%';
+  }
+
+  function archNode(label, level) {
+    return `<span class="ops-arch-node ${escapeHtml(level || 'warn')}">${escapeHtml(label)}</span>`;
+  }
+
+  function renderOpsInsight(status) {
+    const svc = status.services || {};
+    const hs = status.hammerspoon || {};
+    const mods = status.modules || {};
+    const sys = status.system || {};
+    const hotkeys = status.hotkeys || null;
+    const metrics = status.metrics || null;
+
+    const stamp = (id, at) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = at ? String(at).replace('T', ' ').slice(0, 19) : '—';
+    };
+
+    const hsLevel = hs.status === 'running' ? 'ok' : 'warn';
+    const ghosttyLevel = (svc.ghostty || {}).status === 'running' ? 'ok' : 'warn';
+    const projectLevel = (svc.project || {}).path_exists ? 'ok' : 'bad';
+    const ollamaLevel = (svc.ollama || {}).endpoint_reachable ? 'ok' : 'warn';
+    const n8nLevel = (svc.n8n || {}).endpoint_reachable ? 'ok' : 'warn';
+    const openclawLevel = (svc.openclaw || {}).endpoint_reachable ? 'ok' : 'warn';
+    const opsLevel = mods.operations_console === 'healthy' ? 'ok' : 'warn';
+    const insightLevel = mods.insight === 'healthy' ? 'ok' : 'warn';
+    const logsLevel = status.generated_at ? 'ok' : 'warn';
+
+    const arch = document.getElementById('ops-arch-map');
+    if (arch) {
+      arch.innerHTML = [
+        archNode('Hotkeys / Shortcuts', hotkeys && (hotkeys.conflict_count || 0) > 0 ? 'warn' : (hotkeys ? 'ok' : 'warn')),
+        '<span class="ops-arch-arrow">→</span>',
+        archNode('Hammerspoon', hsLevel),
+        '<span class="ops-arch-arrow">→</span>',
+        archNode('Ghostty', ghosttyLevel),
+        '<span class="ops-arch-arrow">→</span>',
+        archNode('Terminal Ops', ghosttyLevel),
+        '<span class="ops-arch-arrow">→</span>',
+        archNode('Project', projectLevel),
+        '<span class="ops-arch-arrow">→</span>',
+        archNode('Ops status / logs', logsLevel),
+        '<span class="ops-arch-arrow">·</span>',
+        archNode('Ollama', ollamaLevel),
+        archNode('n8n', n8nLevel),
+        archNode('OpenClaw', openclawLevel),
+        archNode('insight.lua', insightLevel),
+        archNode('console', opsLevel),
+      ].join('');
+    }
+    stamp('ops-arch-stamp', status.generated_at);
+
+    const sysEl = document.getElementById('ops-system-metrics');
+    if (sysEl) {
+      const cpu = sys.cpu || {};
+      const mem = sys.memory || {};
+      const bat = sys.battery || {};
+      const load = sys.loadavg;
+      const rows = [
+        ['CPU active', fmtPct(cpu.active)],
+        ['CPU user/sys', (cpu.user != null ? fmtPct(cpu.user) : '—') + ' / ' + (cpu.system != null ? fmtPct(cpu.system) : '—')],
+        ['Mem free', mem.free_mb != null ? mem.free_mb + ' MB' : '—'],
+        ['Mem active', mem.active_mb != null ? mem.active_mb + ' MB' : '—'],
+        ['Mem wired', mem.wired_mb != null ? mem.wired_mb + ' MB' : '—'],
+        ['Load avg', Array.isArray(load) ? load.map(n => Number(n).toFixed(2)).join(' · ') : (load != null ? String(load) : '—')],
+        ['Battery', bat.percentage != null
+          ? (Math.round(bat.percentage) + '%' + (bat.is_charging ? ' charging' : '') + (bat.power_source ? ' · ' + bat.power_source : ''))
+          : '—'],
+      ];
+      sysEl.innerHTML = rows.map(([k, v]) =>
+        `<li><span>${escapeHtml(k)}</span><span>${escapeHtml(v)}</span></li>`
+      ).join('');
+    }
+    stamp('ops-system-stamp', sys.at);
+
+    const probeEl = document.getElementById('ops-perf-probes');
+    if (probeEl) {
+      const probes = (metrics && metrics.probes) || [];
+      if (!probes.length) {
+        probeEl.innerHTML = '<li><span>probes</span><span>Run Perf Probes to populate timings</span></li>';
+      } else {
+        probeEl.innerHTML = probes.map(p => {
+          const timing = p.ms != null ? p.ms + ' ms' : '—';
+          const ok = p.ok === false ? 'bad' : (p.ok ? 'ok' : '');
+          return `<li><span class="ops-check-${p.ok === false ? 'FAIL' : (p.ok ? 'PASS' : 'WARNING')}">${escapeHtml(p.id || '?')}</span><span class="${ok}">${escapeHtml(timing)} · ${escapeHtml(p.detail || '')}</span></li>`;
+        }).join('');
+      }
+    }
+    stamp('ops-metrics-stamp', metrics && metrics.at);
+
+    const hkEl = document.getElementById('ops-hotkey-conflicts');
+    if (hkEl) {
+      if (!hotkeys) {
+        hkEl.innerHTML = '<li><span>scan</span><span>Run Scan Hotkeys to inventory HS bindings</span></li>';
+      } else {
+        const conflicts = hotkeys.conflicts || [];
+        const head = `<li><span>bindings</span><span>${escapeHtml(String(hotkeys.count || 0))} registered · ${escapeHtml(String(hotkeys.conflict_count || 0))} HS duplicates</span></li>`;
+        if (!conflicts.length) {
+          hkEl.innerHTML = head + '<li><span>conflicts</span><span>None inside Hammerspoon</span></li>';
+        } else {
+          hkEl.innerHTML = head + conflicts.map(c =>
+            `<li class="ops-hotkey-conflict"><span>${escapeHtml(c.chord || '?')}</span><span>${escapeHtml((c.bindings || []).join(' · '))}</span></li>`
+          ).join('');
+        }
+      }
+    }
+    stamp('ops-hotkeys-stamp', hotkeys && hotkeys.at);
+  }
+
   function eventMatchesFilter(ev) {
     if (opsEventFilter === 'all') return true;
     if (opsEventFilter === 'errors') return ev.severity === 'error';
     if (opsEventFilter === 'warnings') return ev.severity === 'warning';
     if (opsEventFilter === 'actions') return !!ev.action;
+    if (opsEventFilter === 'source-operations') return (ev.source || '') === 'operations';
+    if (opsEventFilter === 'source-diagnostics') {
+      const a = ev.action || '';
+      return a === 'run_diagnostics' || a === 'run_environment_audit' || a === 'run_full_self_test'
+        || a === 'run_verification' || a === 'run_hotkey_scan' || a === 'run_perf_probes'
+        || (ev.source || '') === 'diagnostics' || (ev.source || '') === 'insight';
+    }
     return true;
   }
 
@@ -1804,10 +2180,11 @@ require('modules.windows').toggleAutoTile()</pre>
     el.innerHTML = filtered.map(ev => {
       const sev = ev.severity || 'info';
       const ts = (ev.timestamp || '').replace('T', ' ').slice(0, 19);
+      const src = ev.source || 'operations';
       return `<div class="ops-event-row sev-${escapeHtml(sev)}">
         <span>${escapeHtml(ts)}</span>
         <span>${escapeHtml(sev)}</span>
-        <span>${escapeHtml(ev.source || '')}</span>
+        <span><span class="ops-source-badge">${escapeHtml(src)}</span>${escapeHtml(ev.action || '')}</span>
         <span>${escapeHtml(ev.message || '')}</span>
       </div>`;
     }).join('');
@@ -1859,6 +2236,8 @@ require('modules.windows').toggleAutoTile()</pre>
       renderOpsCards(status);
       renderOpsModules(status);
       renderOpsDiagnostics(status);
+      renderOpsSuites(status);
+      renderOpsInsight(status);
       renderOpsEvents(opsLastEvents);
       wtRenderWalkthrough(status, { statusLoaded: true, events: opsLastEvents });
       initWalkthrough();
@@ -2338,6 +2717,153 @@ require('modules.windows').toggleAutoTile()</pre>
       item.classList.toggle('hidden', q.length > 0 && !terms.includes(q));
     });
   });
+
+  const PROMPT_LIBRARY = [
+    { id: 'explain', label: 'Explain', preview: 'Please explain the following in simple, plain English:\n\n<<selection>>' },
+    { id: 'optimize', label: 'Optimize', preview: 'Optimize the following for clarity, performance, and maintainability. Show the improved version and briefly list what changed.\n\n<<selection>>' },
+    { id: 'summarize', label: 'Summarize', preview: 'Summarize the following in bullet points. Keep facts; omit fluff.\n\n<<selection>>' },
+    { id: 'debug', label: 'Debug', preview: 'Debug the following. Identify likely root causes, suggest fixes, and propose a minimal reproduction or test.\n\n<<selection>>' },
+    { id: 'generate_tests', label: 'Generate Tests', preview: 'Generate focused tests for the following code. Prefer clear arrange/act/assert style and cover edge cases.\n\n<<selection>>' },
+    { id: 'architecture_review', label: 'Architecture Review', preview: 'Perform an architecture review of the following. Cover boundaries, coupling, failure modes, and incremental improvements.\n\n<<selection>>' },
+    { id: 'security_review', label: 'Security Review', preview: 'Perform a security review of the following. Focus on injection, secrets, authz, path traversal, and unsafe shell/URL handling.\n\n<<selection>>' },
+    { id: 'swift_review', label: 'Swift Review', preview: 'Review the following Swift code for correctness, Swift idioms, concurrency hazards, and API misuse.\n\n<<selection>>' },
+    { id: 'shell_review', label: 'Shell Review', preview: 'Review the following shell script for correctness, quoting, set -euo pipefail hygiene, and portability on macOS zsh/bash.\n\n<<selection>>' },
+    { id: 'applescript_review', label: 'AppleScript Review', preview: 'Review the following AppleScript for correctness, app targeting, timing races, and safer alternatives where appropriate.\n\n<<selection>>' },
+    { id: 'markdown_review', label: 'Markdown Review', preview: 'Review and improve the following Markdown for structure, clarity, and consistency. Return the revised document.\n\n<<selection>>' },
+  ];
+
+  let selectedPromptId = null;
+
+  function initPromptLibrary() {
+    const list = document.getElementById('prompt-library-list');
+    const title = document.getElementById('prompt-preview-title');
+    const body = document.getElementById('prompt-preview-body');
+    const runBtn = document.getElementById('prompt-run-btn');
+    if (!list || list.dataset.bound) return;
+    list.dataset.bound = '1';
+    list.innerHTML = PROMPT_LIBRARY.map(p =>
+      `<button type="button" data-prompt-id="${escapeHtml(p.id)}">${escapeHtml(p.label)}</button>`
+    ).join('');
+    list.addEventListener('click', e => {
+      const btn = e.target.closest('[data-prompt-id]');
+      if (!btn) return;
+      selectedPromptId = btn.dataset.promptId;
+      const item = PROMPT_LIBRARY.find(p => p.id === selectedPromptId);
+      list.querySelectorAll('button').forEach(b => b.classList.toggle('active', b === btn));
+      if (item) {
+        title.textContent = item.label;
+        body.textContent = item.preview;
+        runBtn.disabled = false;
+      }
+    });
+    runBtn?.addEventListener('click', () => {
+      if (!selectedPromptId) return;
+      const item = PROMPT_LIBRARY.find(p => p.id === selectedPromptId);
+      fireOpsAction('ai_prompt', item ? item.label : selectedPromptId, { prompt: selectedPromptId });
+    });
+  }
+
+  function buildGlobalSearchIndex() {
+    const items = [];
+    document.querySelectorAll('.hotkey-item').forEach(el => {
+      items.push({
+        cat: 'Hotkey',
+        title: (el.querySelector('.label')?.textContent || el.textContent || '').trim().slice(0, 80),
+        terms: ((el.dataset.terms || '') + ' ' + el.textContent).toLowerCase(),
+        go: () => {
+          document.querySelector('[data-tab="hotkeys"]')?.click();
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        },
+      });
+    });
+    document.querySelectorAll('main .panel').forEach(panel => {
+      const id = panel.id || 'section';
+      const h = panel.querySelector('h2');
+      if (!h) return;
+      items.push({
+        cat: 'Section',
+        title: h.textContent.trim(),
+        terms: (id + ' ' + h.textContent + ' ' + (panel.textContent || '').slice(0, 500)).toLowerCase(),
+        go: () => {
+          document.querySelector(`nav.tabs [data-tab="${id}"]`)?.click();
+          panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        },
+      });
+    });
+    [
+      { cat: 'API', title: 'hs.reload()', terms: 'hammerspoon reload config api' },
+      { cat: 'API', title: 'hs.application.launchOrFocus', terms: 'hammerspoon launch app api' },
+      { cat: 'API', title: 'hs.http.asyncGet / asyncPost', terms: 'hammerspoon http webhook n8n ollama api' },
+      { cat: 'Module', title: 'modules.operations_console', terms: 'operations status dashboard' },
+      { cat: 'Module', title: 'modules.diagnostics', terms: 'diagnostics audit self-test' },
+      { cat: 'Module', title: 'modules.insight', terms: 'hotkey scan conflicts metrics cpu battery probes architecture' },
+      { cat: 'Ops', title: 'Scan Hotkeys', terms: 'hotkey conflict duplicate chord hammerspoon' },
+      { cat: 'Ops', title: 'Perf Probes', terms: 'latency ollama n8n lm studio ghostty timing metrics' },
+      { cat: 'Module', title: 'modules.terminal_ops', terms: 'ghostty terminal ops panes' },
+      { cat: 'Workflow', title: 'Terminal Ops Center', terms: 'ghostty ops-center launch panes blackdragon' },
+      { cat: 'Troubleshoot', title: 'Hotkeys silent', terms: 'troubleshooting accessibility hotkey silent' },
+      { cat: 'Troubleshoot', title: 'Ghostty won\'t open', terms: 'troubleshooting ghostty automation permission' },
+      { cat: 'AI', title: 'Prompt library', terms: 'ai explain optimize summarize debug review chatgpt' },
+    ].forEach(x => items.push({
+      ...x,
+      go: () => {
+        if (x.cat === 'AI') document.querySelector('[data-tab="prompts"]')?.click();
+        else if (x.title.includes('Terminal')) document.querySelector('[data-tab="terminal"]')?.click();
+        else if (x.cat === 'Troubleshoot') document.querySelector('[data-tab="tips"]')?.click();
+      },
+    }));
+    return items;
+  }
+
+  function initGlobalSearch() {
+    const input = document.getElementById('global-search');
+    const box = document.getElementById('global-search-results');
+    if (!input || !box || input.dataset.bound) return;
+    input.dataset.bound = '1';
+    let index = [];
+    const ensureIndex = () => { if (!index.length) index = buildGlobalSearchIndex(); };
+    input.addEventListener('input', () => {
+      ensureIndex();
+      const q = input.value.trim().toLowerCase();
+      if (!q) { box.hidden = true; box.innerHTML = ''; return; }
+      const hits = index.filter(i => i.terms.includes(q)).slice(0, 12);
+      box.hidden = hits.length === 0;
+      box.innerHTML = hits.map((h, i) =>
+        `<button type="button" data-gs="${i}"><div class="gs-cat">${escapeHtml(h.cat)}</div><div class="gs-title">${escapeHtml(h.title)}</div></button>`
+      ).join('');
+      box.querySelectorAll('button').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const hit = hits[Number(btn.dataset.gs)];
+          hit?.go?.();
+          box.hidden = true;
+        });
+      });
+    });
+    document.addEventListener('click', e => {
+      if (!box.contains(e.target) && e.target !== input) box.hidden = true;
+    });
+  }
+
+  function exportGuidePrefs() {
+    const prefs = {};
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith('bd-')) prefs[k] = localStorage.getItem(k);
+    }
+    const blob = new Blob([JSON.stringify(prefs, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'guide-prefs-' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-') + '.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+    showToast('Guide prefs downloaded — place next to your backups/ops-* folder');
+  }
+
+  document.getElementById('export-guide-prefs-btn')?.addEventListener('click', exportGuidePrefs);
+
+  // init extras after DOM ready hooks
+  initPromptLibrary();
+  initGlobalSearch();
 
   function simLayout(action) {
     const left = document.getElementById('pane-left');

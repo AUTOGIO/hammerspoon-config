@@ -245,6 +245,91 @@ function M.codex(sel)
   hs.alert.show("📋 Codex audit prompt ready — paste into ChatGPT")
 end
 
+function M.optimize(sel)
+  local prompt = "Optimize the following for clarity, performance, and maintainability. Show the improved version and briefly list what changed.\n\n" .. sel
+  hs.pasteboard.setContents(prompt)
+  openURL("https://chatgpt.com")
+  hs.alert.show("📋 Optimize prompt ready — paste into ChatGPT")
+end
+
+function M.summarizeChat(sel)
+  local prompt = "Summarize the following in bullet points. Keep facts; omit fluff.\n\n" .. sel
+  hs.pasteboard.setContents(prompt)
+  openURL("https://chatgpt.com")
+  hs.alert.show("📋 Summarize prompt ready — paste into ChatGPT")
+end
+
+function M.debugPrompt(sel)
+  local prompt = "Debug the following. Identify likely root causes, suggest fixes, and propose a minimal reproduction or test.\n\n" .. sel
+  hs.pasteboard.setContents(prompt)
+  openURL("https://chatgpt.com")
+  hs.alert.show("📋 Debug prompt ready — paste into ChatGPT")
+end
+
+function M.generateTests(sel)
+  local prompt = "Generate focused tests for the following code. Prefer clear arrange/act/assert style and cover edge cases.\n\n" .. sel
+  hs.pasteboard.setContents(prompt)
+  openURL("https://chatgpt.com")
+  hs.alert.show("📋 Generate-tests prompt ready — paste into ChatGPT")
+end
+
+function M.architectureReview(sel)
+  local prompt = "Perform an architecture review of the following. Cover boundaries, coupling, failure modes, and incremental improvements.\n\n" .. sel
+  hs.pasteboard.setContents(prompt)
+  openURL("https://chatgpt.com")
+  hs.alert.show("📋 Architecture review prompt ready — paste into ChatGPT")
+end
+
+function M.securityReview(sel)
+  local prompt = "Perform a security review of the following. Focus on injection, secrets, authz, path traversal, and unsafe shell/URL handling.\n\n" .. sel
+  hs.pasteboard.setContents(prompt)
+  openURL("https://chatgpt.com")
+  hs.alert.show("📋 Security review prompt ready — paste into ChatGPT")
+end
+
+function M.swiftReview(sel)
+  local prompt = "Review the following Swift code for correctness, Swift idioms, concurrency hazards, and API misuse.\n\n" .. sel
+  hs.pasteboard.setContents(prompt)
+  openURL("https://chatgpt.com")
+  hs.alert.show("📋 Swift review prompt ready — paste into ChatGPT")
+end
+
+function M.shellReview(sel)
+  local prompt = "Review the following shell script for correctness, quoting, set -euo pipefail hygiene, and portability on macOS zsh/bash.\n\n" .. sel
+  hs.pasteboard.setContents(prompt)
+  openURL("https://chatgpt.com")
+  hs.alert.show("📋 Shell review prompt ready — paste into ChatGPT")
+end
+
+function M.applescriptReview(sel)
+  local prompt = "Review the following AppleScript for correctness, app targeting, timing races, and safer alternatives where appropriate.\n\n" .. sel
+  hs.pasteboard.setContents(prompt)
+  openURL("https://chatgpt.com")
+  hs.alert.show("📋 AppleScript review prompt ready — paste into ChatGPT")
+end
+
+function M.markdownReview(sel)
+  local prompt = "Review and improve the following Markdown for structure, clarity, and consistency. Return the revised document.\n\n" .. sel
+  hs.pasteboard.setContents(prompt)
+  openURL("https://chatgpt.com")
+  hs.alert.show("📋 Markdown review prompt ready — paste into ChatGPT")
+end
+
+-- Guide preview catalog (templates use <<selection>> placeholder).
+M.LIBRARY = {
+  { id = 'explain', label = 'Explain', preview = 'Please explain the following in simple, plain English:\n\n<<selection>>' },
+  { id = 'optimize', label = 'Optimize', preview = 'Optimize the following for clarity, performance, and maintainability. Show the improved version and briefly list what changed.\n\n<<selection>>' },
+  { id = 'summarize', label = 'Summarize', preview = 'Summarize the following in bullet points. Keep facts; omit fluff.\n\n<<selection>>' },
+  { id = 'debug', label = 'Debug', preview = 'Debug the following. Identify likely root causes, suggest fixes, and propose a minimal reproduction or test.\n\n<<selection>>' },
+  { id = 'generate_tests', label = 'Generate Tests', preview = 'Generate focused tests for the following code. Prefer clear arrange/act/assert style and cover edge cases.\n\n<<selection>>' },
+  { id = 'architecture_review', label = 'Architecture Review', preview = 'Perform an architecture review of the following. Cover boundaries, coupling, failure modes, and incremental improvements.\n\n<<selection>>' },
+  { id = 'security_review', label = 'Security Review', preview = 'Perform a security review of the following. Focus on injection, secrets, authz, path traversal, and unsafe shell/URL handling.\n\n<<selection>>' },
+  { id = 'swift_review', label = 'Swift Review', preview = 'Review the following Swift code for correctness, Swift idioms, concurrency hazards, and API misuse.\n\n<<selection>>' },
+  { id = 'shell_review', label = 'Shell Review', preview = 'Review the following shell script for correctness, quoting, set -euo pipefail hygiene, and portability on macOS zsh/bash.\n\n<<selection>>' },
+  { id = 'applescript_review', label = 'AppleScript Review', preview = 'Review the following AppleScript for correctness, app targeting, timing races, and safer alternatives where appropriate.\n\n<<selection>>' },
+  { id = 'markdown_review', label = 'Markdown Review', preview = 'Review and improve the following Markdown for structure, clarity, and consistency. Return the revised document.\n\n<<selection>>' },
+}
+
 function M.snapshot()
   local snapDir = os.getenv("HOME")
     .. "/Library/Mobile Documents/com~apple~CloudDocs/Obsidian/AUTOGIO_PROJECT_SNAPSHOTS"
@@ -317,7 +402,17 @@ end
 
 local actions = {
   explain    = function() captureSelection(M.explain) end,
+  optimize   = function() captureSelection(M.optimize) end,
   summary    = function() captureSelection(M.summary) end,
+  summarize  = function() captureSelection(M.summarizeChat) end,
+  debug      = function() captureSelection(M.debugPrompt) end,
+  generate_tests = function() captureSelection(M.generateTests) end,
+  architecture_review = function() captureSelection(M.architectureReview) end,
+  security_review = function() captureSelection(M.securityReview) end,
+  swift_review = function() captureSelection(M.swiftReview) end,
+  shell_review = function() captureSelection(M.shellReview) end,
+  applescript_review = function() captureSelection(M.applescriptReview) end,
+  markdown_review = function() captureSelection(M.markdownReview) end,
   codex      = function() captureSelection(M.codex) end,
   snapshot   = M.snapshot,
   compare    = function() captureSelection(M.compare) end,

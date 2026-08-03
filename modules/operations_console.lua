@@ -37,6 +37,10 @@ local allowedActions = {
   toggle_auto_tile        = true,
   cycle_tiler_mode        = true,
   run_verification        = true,
+  run_diagnostics         = true,
+  run_environment_audit   = true,
+  run_full_self_test      = true,
+  backup_configuration    = true,
   open_guide              = true,
   open_hammerspoon_folder = true,
   open_project_folder     = true,
@@ -49,6 +53,8 @@ local allowedActions = {
   trigger_n8n           = true,
   launch_app            = true,
   ai_prompt             = true,
+  run_hotkey_scan       = true,
+  run_perf_probes       = true,
 }
 
 local allowedLaunchApps = {
@@ -65,19 +71,29 @@ local allowedLaunchApps = {
 
 local allowedAiPrompts = {
   explain = true,
+  optimize = true,
+  summary = true,
+  summarize = true,
+  debug = true,
+  generate_tests = true,
+  architecture_review = true,
+  security_review = true,
+  swift_review = true,
+  shell_review = true,
+  applescript_review = true,
+  markdown_review = true,
   codex = true,
   snapshot = true,
   deliver = true,
   compare = true,
   structured = true,
-  summary = true,
   console = true,
   quick = true,
 }
 
 local MODULE_KEYS = {
   'paths', 'layouts', 'windows', 'terminal_ops', 'clipboard', 'ai', 'n8n',
-  'guide', 'verify', 'hotkeys', 'apps', 'openclaw_button', 'operations_console',
+  'guide', 'verify', 'hotkeys', 'apps', 'openclaw_button', 'operations_console', 'diagnostics', 'insight',
 }
 
 -- ── Utilities ────────────────────────────────────────────────────────────────
@@ -592,6 +608,19 @@ local function writeStatus(data)
       history_count = require('modules.clipboard').count(),
       watcher_alive = require('modules.clipboard').watcherAlive(),
     }
+    -- Preserve last suite runs across 30s refresh (do not re-run suites here)
+    if statusCache then
+      data.diagnostics = data.diagnostics or statusCache.diagnostics
+      data.environment = data.environment or statusCache.environment
+      data.verification = data.verification or statusCache.verification
+      data.hotkeys = data.hotkeys or statusCache.hotkeys
+      data.metrics = data.metrics or statusCache.metrics
+    end
+    -- Fresh thin host metrics each write (cheap)
+    local insightOk, insight = pcall(require, 'modules.insight')
+    if insightOk and insight and insight.hostMetrics then
+      data.system = insight.hostMetrics()
+    end
   end
   statusCache = data
   local ok, err = atomicWriteJSON(STATUS_PATH, data)
@@ -836,6 +865,7 @@ function M.execute(actionName, payload)
   end
 
   local ok, errMsg, detail, nextCheck = false, nil, nil, nil
+  local eventSource = 'operations'
 
   if actionName == 'refresh_status' then
     M.refreshStatus()
@@ -971,10 +1001,128 @@ function M.execute(actionName, payload)
     end
 
   elseif actionName == 'run_verification' then
-  local report, pass, fail = require('modules.verify').run()
+    local report, pass, fail = require('modules.verify').run()
     ok = fail == 0
     errMsg = string.format('Verify: %d ok, %d fail', pass, fail)
     detail = report
+
+  elseif actionName == 'run_diagnostics' then
+    local result = require('modules.diagnostics').runDiagnostics()
+    statusCache.diagnostics = result
+    writeStatus(statusCache)
+    ok = (result.fail or 0) == 0
+    errMsg = string.format('Diagnostics: %d/100 (%d pass, %d fail, %d warn)',
+      result.score or 0, result.pass or 0, result.fail or 0, result.warn or 0)
+    detail = hs.json.encode(result)
+    eventSource = 'diagnostics'
+
+  elseif actionName == 'run_environment_audit' then
+    local result = require('modules.diagnostics').runEnvironmentAudit()
+    statusCache.environment = result
+    writeStatus(statusCache)
+    ok = (result.fail or 0) == 0
+    errMsg = string.format('Environment audit: %d/100 (%d issues)',
+      result.score or 0, result.issues and #result.issues or 0)
+    detail = hs.json.encode(result)
+    eventSource = 'diagnostics'
+
+  elseif actionName == 'run_full_self_test' then
+    local result = require('modules.verify').runFull()
+    statusCache.verification = result
+    writeStatus(statusCache)
+    ok = (result.fail or 0) == 0
+    errMsg = string.format('Self-test: %d/100 (%d pass, %d fail, %d warn)',
+      result.score or 0, result.pass or 0, result.fail or 0, result.warn or 0)
+    detail = result.report or hs.json.encode(result)
+    eventSource = 'diagnostics'
+
+  elseif actionName == 'backup_configuration' then
+    local backupRoot = hs.configdir .. '/backups'
+    if not isDir(backupRoot) then hs.fs.mkdir(backupRoot) end
+    local stamp = os.date('%Y%m%d-%H%M%S')
+    local dest = backupRoot .. '/ops-' .. stamp
+    hs.fs.mkdir(dest)
+
+    local manifest = {
+      'BlackDragon configuration backup',
+      'Created: ' .. isoNow(),
+      'Includes:',
+      '  - hammerspoon/ (excludes runtime/, .git/, backups/, .superpowers/, .env*)',
+      '  - ghostty/config (if present)',
+      '  - terminal-ops Ghostty conf (if present)',
+      'Guide localStorage prefs are browser-side — use Export guide prefs in the guide.',
+      '',
+    }
+
+    local hsDest = dest .. '/hammerspoon'
+    hs.fs.mkdir(hsDest)
+    local tarCmd = string.format(
+      'tar -C %s -cf - --exclude=runtime --exclude=.git --exclude=backups --exclude=.superpowers --exclude=.env --exclude=.env.* . | tar -C %s -xf -',
+      shellQuote(hs.configdir),
+      shellQuote(hsDest)
+    )
+    local tarOk = select(1, runShell(tarCmd))
+    if not tarOk then
+      local keyFiles = { 'init.lua', 'AGENTS.md', 'README.md', '.cursorrules', '.gitignore' }
+      for _, f in ipairs(keyFiles) do
+        local src = hs.configdir .. '/' .. f
+        if pathExists(src) then
+          hs.execute('cp ' .. shellQuote(src) .. ' ' .. shellQuote(hsDest .. '/' .. f))
+        end
+      end
+      hs.execute('cp -R ' .. shellQuote(hs.configdir .. '/modules') .. ' ' .. shellQuote(hsDest .. '/modules'))
+      hs.execute('cp -R ' .. shellQuote(hs.configdir .. '/docs') .. ' ' .. shellQuote(hsDest .. '/docs'))
+      hs.execute('cp -R ' .. shellQuote(hs.configdir .. '/scripts') .. ' ' .. shellQuote(hsDest .. '/scripts'))
+      manifest[#manifest + 1] = 'Note: used fallback copy (tar failed)'
+    end
+
+    if pathExists(GHOSTTY_CONFIG) then
+      local gDest = dest .. '/ghostty'
+      hs.fs.mkdir(gDest)
+      hs.execute('cp ' .. shellQuote(GHOSTTY_CONFIG) .. ' ' .. shellQuote(gDest .. '/config'))
+    else
+      manifest[#manifest + 1] = 'Missing: Ghostty config'
+    end
+
+    if pathExists(TERMINAL_OPS_CONFIG) then
+      local tDest = dest .. '/ghostty-ops'
+      hs.fs.mkdir(tDest)
+      hs.execute('cp ' .. shellQuote(TERMINAL_OPS_CONFIG) .. ' ' .. shellQuote(tDest .. '/ghostty-terminal-ops-center.conf'))
+    end
+
+    local mf = io.open(dest .. '/BACKUP_MANIFEST.txt', 'w')
+    if mf then
+      mf:write(table.concat(manifest, '\n') .. '\n')
+      mf:close()
+    end
+
+    openPath(dest)
+    ok = true
+    errMsg = 'Backup created: ' .. dest
+    detail = dest
+
+  elseif actionName == 'run_hotkey_scan' then
+    local result = require('modules.insight').scanHotkeys()
+    statusCache.hotkeys = result
+    writeStatus(statusCache)
+    ok = (result.conflict_count or 0) == 0
+    errMsg = string.format('Hotkey scan: %d bindings, %d conflicts',
+      result.count or 0, result.conflict_count or 0)
+    detail = hs.json.encode(result)
+    eventSource = 'insight'
+
+  elseif actionName == 'run_perf_probes' then
+    local result = require('modules.insight').runPerfProbes()
+    statusCache.metrics = result
+    writeStatus(statusCache)
+    ok = true
+    local parts = {}
+    for _, p in ipairs(result.probes or {}) do
+      parts[#parts + 1] = string.format('%s=%s', p.id, p.ms and (p.ms .. 'ms') or tostring(p.detail))
+    end
+    errMsg = 'Perf probes: ' .. table.concat(parts, ', ')
+    detail = hs.json.encode(result)
+    eventSource = 'insight'
 
   elseif actionName == 'open_guide' then
     require('modules.guide').open()
@@ -1029,7 +1177,7 @@ function M.execute(actionName, payload)
 
   M.recordEvent({
     severity = ok and 'success' or 'error',
-    source = 'operations',
+    source = eventSource or 'operations',
     action = actionName,
     message = errMsg or (ok and 'OK' or 'Failed'),
     success = ok,
