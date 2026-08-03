@@ -6,7 +6,6 @@ local M = {}
 
 local log     = hs.logger.new('layouts', 'info')
 local windows = require('modules.windows')
-local apps    = require('modules.apps')
 
 M.launchWait      = 0.45  -- seconds to wait after launchOrFocus before positioning
 M.placementPause  = 2500  -- ms the tiler is paused while a layout is applied
@@ -23,25 +22,6 @@ local menubar  = nil
 local function frameFor(recipe, screen)
   local f = screen:visibleFrame()
   local gap = windows.tileGap or 0
-
-  local function columnFrame(fractions, index)
-    local n = #fractions
-    local usable = f.w - gap * (n - 1)
-    local x = f.x
-    for i = 1, index - 1 do
-      x = x + usable * fractions[i] + gap
-    end
-    return {
-      x = x,
-      y = f.y,
-      w = usable * fractions[index],
-      h = f.h,
-    }
-  end
-
-  local cmdCenter = { 0.15, 0.42, 0.28, 0.15 }
-  local devConsole = { 0.45, 0.35, 0.20 }
-
   local recipes = {
     full     = function() return { x = f.x, y = f.y, w = f.w, h = f.h } end,
     left50   = function() return { x = f.x, y = f.y, w = (f.w - gap) / 2, h = f.h } end,
@@ -67,13 +47,6 @@ local function frameFor(recipe, screen)
         w = f.w * 0.8,       h = f.h * 0.8,
       }
     end,
-    command_ai    = function() return columnFrame(cmdCenter, 1) end,
-    command_code  = function() return columnFrame(cmdCenter, 2) end,
-    command_shell = function() return columnFrame(cmdCenter, 3) end,
-    command_notes = function() return columnFrame(cmdCenter, 4) end,
-    span45_left  = function() return columnFrame(devConsole, 1) end,
-    span35_mid   = function() return columnFrame(devConsole, 2) end,
-    span20_right = function() return columnFrame(devConsole, 3) end,
   }
   local fn = recipes[recipe]
   if not fn then
@@ -98,7 +71,7 @@ M.layouts = {
     ultrawide_only = true,
     apps           = {
       { name = 'Cursor',        where = 'col1of3' },
-      { name = 'ChatGPT Atlas', where = 'col2of3' },
+      { name = 'ChatGPT Atlas', where = 'col2of3', fallback = 'Safari' },
       { name = 'Ghostty',       where = 'col3of3', fallback = 'Terminal' },
     },
   },
@@ -110,37 +83,12 @@ M.layouts = {
     label = 'Writing',
     apps  = {
       { name = 'Notes',         where = 'left50' },
-      { name = 'ChatGPT Atlas', where = 'right50' },
+      { name = 'ChatGPT Atlas', where = 'right50', fallback = 'Safari' },
     },
-  },
-  command_center = {
-    label          = 'Command Center',
-    ultrawide_only = true,
-    apps           = {
-      { name = 'Cursor',        where = 'command_code' },
-      { name = 'ChatGPT Atlas', where = 'command_ai' },
-      { name = 'Ghostty',       where = 'command_shell', fallback = 'Terminal' },
-      { name = 'Notes',         where = 'command_notes' },
-    },
-  },
-  dev_console = {
-    label          = 'Dev Console',
-    ultrawide_only = true,
-    apps           = {
-      { name = 'Cursor',      where = 'span45_left' },
-      { name = 'Ghostty',     where = 'span35_mid', fallback = 'Terminal' },
-      { name = 'Hammerspoon', where = 'span20_right' },
-    },
-    on_finalize = function()
-      pcall(function()
-        if hs.openConsole then hs.openConsole() end
-      end)
-      hs.application.launchOrFocus('Hammerspoon')
-    end,
   },
 }
 
-M.order = { 'coding', 'ai_workflow', 'ops', 'writing', 'command_center', 'dev_console' }
+M.order = { 'coding', 'ai_workflow', 'ops', 'writing' }
 
 -- ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -243,12 +191,10 @@ function M.apply(name)
 
   local function finalize()
     hideOthers(placed)
+    -- Focus the first app in the layout so master-stack picks it up.
     local first = layout.apps[1]
     local app = first and hs.application.find(first.name)
     if app then app:activate() end
-    if layout.on_finalize then
-      pcall(layout.on_finalize)
-    end
     M.activeLayout = name
     hs.settings.set('layouts_active', name)
     hs.alert.show('🗂 ' .. layout.label)

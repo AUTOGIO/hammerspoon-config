@@ -1,26 +1,19 @@
 # Hammerspoon config (live)
 
-This directory is the **active** Hammerspoon configuration loaded at runtime.
+Personal macOS automation loaded by Hammerspoon from `~/.hammerspoon/`.
+Window layouts, hotkeys, Operations Console, and AI/terminal helpers.
 
-- **Path:** `~/.hammerspoon/`
-- **Reload:** `⌘⌃R` or save any file here (path watcher)
-- **Guide:** `⌘⌃H` or open `USER_GUIDE.html`
+**Run:** Hammerspoon loads this folder automatically. Reload with `⌘⌃R` (or save a file — path watcher).
+**Guide:** `⌘⌃H` or open `docs/USER_GUIDE.html`.
+**First change (simple):** follow `docs/HOW_TO_MAKE_A_CHANGE.md`.
+**Verify:** in the Hammerspoon Console run `require('modules.verify').run()`.
 
-The Time Machine backup copy under `/Volumes/.timemachine/.../.hammerspoon/` is read-only. Edit files here, not in the backup workspace.
+## Where things live
 
-## Git
+- `init.lua` + `modules/` + `Spoons/` — app code (must stay at root; Hammerspoon convention)
+- `scripts/` — shell / AppleScript helpers (Ghostty ops center)
+- `docs/` — user guide, tuning notes, operations docs
+- `runtime/` — machine-written status JSON (gitignored)
+- `archive/` — old backups and superseded files
 
-This folder is version-controlled. After changes:
-
-```bash
-cd ~/.hammerspoon
-git status
-git add -A
-git commit -m "your message"
-```
-
-## Verify
-
-```lua
-require('modules.verify').run()
-```
+Layout rules for editors/agents: see `AGENTS.md`.

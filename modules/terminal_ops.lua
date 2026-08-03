@@ -3,10 +3,14 @@
 local M = {}
 
 local log = hs.logger.new('terminal_ops', 'info')
+local paths = require('modules.paths')
 local scriptPath = hs.configdir .. '/scripts/ghostty/launch-terminal-operations-center.applescript'
 
-local defaultProjectDir = os.getenv('HOME') .. '/Documents/01_Projects/BlackDragon_Project'
-M.projectDir = os.getenv('TERMINAL_OPS_PROJECT_DIR') or defaultProjectDir
+M.projectDir = paths.resolveBlackDragonProject()
+
+function M.getProjectDir()
+  return paths.resolveBlackDragonProject()
+end
 local paneScript = hs.configdir .. '/scripts/ghostty/terminal-ops-pane.sh'
 
 local function escapeApplescriptString(s)
@@ -27,7 +31,8 @@ local function readScriptBody()
 end
 
 function M.launch()
-  local projectDir = M.projectDir
+  local projectDir = M.getProjectDir()
+  M.projectDir = projectDir
   local attrs = hs.fs.attributes(projectDir)
   if not attrs or attrs.mode ~= 'directory' then
     hs.alert.show('⚠ Terminal Ops: project dir not found\n' .. tostring(projectDir))

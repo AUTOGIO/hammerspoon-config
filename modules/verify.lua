@@ -4,6 +4,7 @@ local M = {}
 
 local windows = require('modules.windows')
 local layouts = require('modules.layouts')
+local paths = require('modules.paths')
 
 local function aspect(screen)
   local f = screen:frame()
@@ -52,6 +53,11 @@ function M.run()
     local layout = layouts.layouts[key]
     check('layout: ' .. key, layout ~= nil, layout and layout.label or 'missing')
   end
+
+  local proj = paths.resolveBlackDragonProject()
+  local attrs = hs.fs.attributes(proj)
+  local projOk = attrs and attrs.mode == 'directory'
+  check('BlackDragon project dir', projOk, proj)
 
   lines[#lines + 1] = string.format('=== %d passed, %d failed ===', pass, fail)
   local report = table.concat(lines, '\n')

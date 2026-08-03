@@ -48,7 +48,7 @@ Override project directory:
 TERMINAL_OPS_PROJECT_DIR=~/path/to/repo ops-center
 ```
 
-Default: `~/Documents/01_Projects/BlackDragon_Project` (also set in `~/.zshrc`).
+Default: `~/Documents/GitHub/AI_Engineering_OS`. Override with `TERMINAL_OPS_PROJECT_DIR`. Legacy fallback: `~/Documents/01_Projects/BlackDragon_Project` if neither path exists.
 
 ## Per-project pane overrides
 

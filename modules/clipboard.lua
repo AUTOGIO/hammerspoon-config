@@ -29,5 +29,7 @@ function M.showHistory()
   chooser:choices(choices); chooser:show()
 end
 function M.clearHistory() history = {}; hs.alert.show('📋 Cleared') end
+function M.count() return #history end
+function M.watcherAlive() return watcher ~= nil end
 M.startWatcher()
 return M

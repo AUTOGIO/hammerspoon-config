@@ -2,7 +2,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="${0:A:h}"
-DEFAULT_PROJECT_DIR="$HOME/Documents/01_Projects/BlackDragon_Project"
+DEFAULT_PROJECT_DIR="$HOME/Documents/GitHub/AI_Engineering_OS"
 PROJECT_DIR="${PROJECT_DIR:-${TERMINAL_OPS_PROJECT_DIR:-$DEFAULT_PROJECT_DIR}}"
 PROJECT_DIR_ESCAPED="${PROJECT_DIR//\"/\\\"}"
 PANE_SCRIPT="$SCRIPT_DIR/terminal-ops-pane.sh"

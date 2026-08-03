@@ -1,0 +1,2423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BlackDragon — Interactive Automation Guide</title>
+  <style>
+    :root {
+      --bg: #0a0c10;
+      --surface: #141820;
+      --surface2: #1c2230;
+      --surface3: #252d3d;
+      --border: #2e3848;
+      --text: #eef0f6;
+      --muted: #8b93a8;
+      --accent: #5b9cff;
+      --accent-dim: #3d7ad4;
+      --purple: #a78bfa;
+      --green: #34d399;
+      --amber: #fbbf24;
+      --red: #f87171;
+      --radius: 12px;
+      --font: "SF Pro Text", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --mono: "SF Mono", "Fira Code", Menlo, monospace;
+      --shadow: 0 12px 40px rgba(0,0,0,0.35);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.65; min-height: 100vh; }
+
+    .hero {
+      background: linear-gradient(145deg, #12182a 0%, #0a0c10 55%, #0f1520 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 2.5rem 2rem 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -40%; right: -10%;
+      width: 420px; height: 420px;
+      background: radial-gradient(circle, rgba(91,156,255,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-inner { max-width: 1100px; margin: 0 auto; position: relative; }
+    .hero h1 { font-size: 2rem; font-weight: 700; letter-spacing: -0.03em; }
+    .hero .subtitle { color: var(--muted); margin-top: 0.4rem; font-size: 1.05rem; max-width: 640px; }
+    .hero-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.25rem; align-items: center; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 999px; padding: 0.2rem 0.75rem;
+      font-size: 0.75rem; color: var(--accent);
+    }
+    .badge.live { border-color: rgba(52,211,153,0.4); color: var(--green); }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.25rem; }
+    .hero-btn {
+      background: var(--accent); color: #0a0c10; border: none;
+      border-radius: var(--radius); padding: 0.55rem 1.1rem;
+      font-family: var(--font); font-size: 0.875rem; font-weight: 600;
+      cursor: pointer; transition: background 0.15s, transform 0.1s;
+    }
+    .hero-btn:hover { background: var(--accent-dim); }
+    .hero-btn:active { transform: scale(0.98); }
+    .hero-btn.ghost {
+      background: transparent; color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .hero-btn.ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+    nav.tabs {
+      display: flex; gap: 0.2rem; padding: 0.65rem 2rem;
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      overflow-x: auto; position: sticky; top: 0; z-index: 100;
+      max-width: 100%;
+    }
+    nav.tabs button {
+      background: transparent; border: 1px solid transparent;
+      color: var(--muted); font-family: var(--font); font-size: 0.84rem;
+      padding: 0.5rem 0.95rem; border-radius: var(--radius);
+      cursor: pointer; white-space: nowrap; transition: all 0.15s;
+    }
+    nav.tabs button:hover { color: var(--text); background: var(--surface2); }
+    nav.tabs button.active {
+      color: var(--accent); background: var(--surface2); border-color: var(--border);
+    }
+
+    main { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+    .panel { display: none; animation: fadeIn 0.25s ease; }
+    .panel.active { display: block; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    h2 { font-size: 1.5rem; margin-bottom: 0.35rem; letter-spacing: -0.02em; }
+    .section-lead { color: var(--muted); margin-bottom: 1.5rem; font-size: 0.95rem; }
+    h3 { font-size: 1.05rem; margin: 1.5rem 0 0.75rem; color: var(--accent); }
+    h3:first-child { margin-top: 0; }
+    p { margin-bottom: 0.75rem; color: var(--muted); }
+    p strong { color: var(--text); }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1rem 0; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.85rem; margin: 1rem 0; }
+
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1rem;
+      box-shadow: var(--shadow);
+    }
+    .card h3 { margin-top: 0; }
+
+    .tip-card {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1rem 1.15rem;
+      transition: border-color 0.15s;
+    }
+    .tip-card:hover { border-color: rgba(91,156,255,0.35); }
+    .tip-card .tip-icon { font-size: 1.25rem; margin-bottom: 0.35rem; }
+    .tip-card h4 { font-size: 0.92rem; color: var(--text); margin-bottom: 0.35rem; }
+    .tip-card p { font-size: 0.84rem; margin: 0; line-height: 1.5; }
+
+    .alert-box {
+      border-radius: var(--radius); padding: 0.9rem 1.1rem;
+      font-size: 0.875rem; color: var(--muted); margin: 1rem 0;
+      border: 1px solid transparent;
+    }
+    .alert-box.info { background: rgba(91,156,255,0.08); border-color: rgba(91,156,255,0.25); }
+    .alert-box.warn { background: rgba(251,191,36,0.08); border-color: rgba(251,191,36,0.3); }
+    .alert-box.success { background: rgba(52,211,153,0.08); border-color: rgba(52,211,153,0.3); }
+    .alert-box strong { color: var(--text); }
+
+    .checklist { list-style: none; margin: 1rem 0; }
+    .checklist li {
+      display: flex; align-items: flex-start; gap: 0.75rem;
+      padding: 0.65rem 0; border-bottom: 1px solid var(--border);
+      font-size: 0.9rem; color: var(--muted);
+    }
+    .checklist li:last-child { border-bottom: none; }
+    .checklist input[type=checkbox] {
+      width: 1.1rem; height: 1.1rem; margin-top: 0.15rem;
+      accent-color: var(--accent); cursor: pointer; flex-shrink: 0;
+    }
+    .checklist li.done { color: var(--muted); opacity: 0.75; }
+    .checklist li.done strong { text-decoration: line-through; }
+
+    .hotkey-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+      gap: 0.65rem; margin: 1rem 0;
+    }
+    .hotkey-item {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 0.8rem 1rem;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 0.75rem; width: 100%; text-align: left;
+      font-family: var(--font); color: var(--text);
+    }
+    button.hotkey-item.actionable {
+      cursor: pointer; transition: border-color 0.15s, background 0.15s, transform 0.1s;
+    }
+    button.hotkey-item.actionable:hover {
+      border-color: var(--accent); background: rgba(91,156,255,0.08);
+    }
+    button.hotkey-item.actionable:active,
+    button.hotkey-item.actionable.pressed {
+      transform: scale(0.98); border-color: var(--green);
+      background: rgba(52,211,153,0.1);
+    }
+    button.hotkey-item.actionable::after {
+      content: '▶'; font-size: 0.65rem; color: var(--muted);
+      opacity: 0; transition: opacity 0.15s;
+    }
+    button.hotkey-item.actionable:hover::after { opacity: 1; color: var(--accent); }
+    .hotkey-item .label { font-size: 0.875rem; }
+    .keys { display: flex; gap: 0.25rem; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; }
+    kbd {
+      background: var(--bg); border: 1px solid var(--border); border-radius: 5px;
+      padding: 0.12rem 0.4rem; font-family: var(--mono); font-size: 0.7rem;
+      color: var(--text); box-shadow: 0 2px 0 var(--border);
+    }
+
+    .action-toast {
+      position: fixed; bottom: 1.5rem; left: 50%;
+      transform: translateX(-50%) translateY(120%);
+      background: var(--surface); border: 1px solid var(--green);
+      color: var(--green); padding: 0.75rem 1.25rem; border-radius: var(--radius);
+      font-size: 0.875rem; z-index: 200; box-shadow: var(--shadow);
+      transition: transform 0.25s ease; max-width: 90vw; text-align: center;
+    }
+    .action-toast.show { transform: translateX(-50%) translateY(0); }
+
+    .action-panel {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1rem 1.25rem; margin: 0.75rem 0 1rem;
+    }
+    .action-panel h4 {
+      font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--muted); margin-bottom: 0.5rem;
+    }
+    #action-status {
+      font-family: var(--mono); font-size: 0.8rem; color: var(--green);
+      min-height: 1.5rem; white-space: pre-wrap;
+    }
+    #action-status.empty { color: var(--muted); font-style: italic; font-family: var(--font); }
+
+    .example { border-left: 3px solid var(--accent); margin-bottom: 1.25rem; }
+    .example-header {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      gap: 1rem; cursor: pointer; user-select: none;
+    }
+    .example-num {
+      background: linear-gradient(135deg, var(--accent), var(--purple));
+      color: #0a0c10; font-weight: 700; font-size: 0.75rem;
+      width: 1.75rem; height: 1.75rem; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .example-title { font-size: 1.05rem; font-weight: 600; color: var(--text); }
+    .example-sub { font-size: 0.82rem; color: var(--muted); margin-top: 0.2rem; }
+    .chevron { color: var(--muted); transition: transform 0.2s; font-size: 1.1rem; }
+    .example.open .chevron { transform: rotate(180deg); }
+    .example-body {
+      display: none; margin-top: 1rem; padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+    .example.open .example-body { display: block; }
+
+    .steps { list-style: none; counter-reset: step; margin: 1rem 0; }
+    .steps li {
+      counter-increment: step; position: relative; padding-left: 2.25rem;
+      margin-bottom: 0.85rem; color: var(--muted); font-size: 0.9rem;
+    }
+    .steps li::before {
+      content: counter(step); position: absolute; left: 0; top: 0;
+      background: var(--surface3); border: 1px solid var(--border);
+      color: var(--accent); width: 1.5rem; height: 1.5rem; border-radius: 50%;
+      font-size: 0.72rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .code-block {
+      position: relative; background: #06080c; border: 1px solid var(--border);
+      border-radius: var(--radius); margin: 0.75rem 0; overflow: hidden;
+    }
+    .code-block pre {
+      padding: 1rem 1.25rem; overflow-x: auto; font-family: var(--mono);
+      font-size: 0.78rem; line-height: 1.55; color: #c9d1d9;
+    }
+    .code-block .lang-tag {
+      position: absolute; top: 0.5rem; right: 3.5rem;
+      font-size: 0.62rem; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .copy-btn {
+      position: absolute; top: 0.5rem; right: 0.5rem;
+      background: var(--surface2); border: 1px solid var(--border);
+      color: var(--muted); font-size: 0.72rem; padding: 0.25rem 0.55rem;
+      border-radius: 5px; cursor: pointer; font-family: var(--font);
+    }
+    .copy-btn:hover { color: var(--text); border-color: var(--accent); }
+    .copy-btn.copied { color: var(--green); border-color: var(--green); }
+
+    .simulator {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.25rem; margin: 1rem 0;
+    }
+    .simulator h4 {
+      font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--muted); margin-bottom: 0.75rem;
+    }
+    .sim-btn {
+      background: var(--accent); color: #0a0c10; border: none;
+      border-radius: var(--radius); padding: 0.5rem 1rem;
+      font-family: var(--font); font-size: 0.84rem; font-weight: 600;
+      cursor: pointer; margin: 0 0.4rem 0.4rem 0; transition: background 0.15s;
+    }
+    .sim-btn:hover { background: var(--accent-dim); }
+    .sim-btn.secondary {
+      background: var(--surface); color: var(--text); border: 1px solid var(--border);
+    }
+    .sim-btn.secondary:hover { border-color: var(--accent); }
+    .sim-output {
+      margin-top: 0.75rem; padding: 0.75rem 1rem;
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: var(--radius); font-family: var(--mono);
+      font-size: 0.78rem; color: var(--green); min-height: 2.5rem;
+      white-space: pre-wrap; word-break: break-word;
+    }
+    .sim-output.empty { color: var(--muted); font-style: italic; font-family: var(--font); }
+
+    /* Terminal Ops topology */
+    .ops-topology {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 0.5rem; margin: 1rem 0;
+    }
+    .ops-tab {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 0.75rem; cursor: pointer;
+      transition: all 0.15s; text-align: center;
+    }
+    .ops-tab:hover, .ops-tab.active {
+      border-color: var(--accent);
+      background: rgba(91,156,255,0.1);
+    }
+    .ops-tab .tab-num { font-size: 0.65rem; color: var(--muted); text-transform: uppercase; }
+    .ops-tab .tab-name { font-size: 0.8rem; font-weight: 600; color: var(--text); margin: 0.25rem 0; }
+    .ops-tab .tab-panes { font-size: 0.72rem; color: var(--muted); }
+    .ops-detail {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1rem; margin-top: 0.75rem;
+      font-size: 0.85rem; color: var(--muted); min-height: 4rem;
+    }
+
+    table {
+      width: 100%; border-collapse: collapse; font-size: 0.875rem; margin: 1rem 0;
+    }
+    th, td {
+      text-align: left; padding: 0.65rem 0.85rem;
+      border-bottom: 1px solid var(--border);
+    }
+    th {
+      color: var(--muted); font-weight: 500; font-size: 0.72rem;
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    td code { font-family: var(--mono); font-size: 0.78rem; color: var(--accent); }
+    tr:hover td { background: var(--surface2); }
+
+    .search-wrap input {
+      width: 100%; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 0.65rem 1rem;
+      color: var(--text); font-family: var(--font); font-size: 0.9rem; outline: none;
+    }
+    .search-wrap input:focus { border-color: var(--accent); }
+    .search-wrap { margin-bottom: 1.25rem; }
+
+    .module-tag {
+      display: inline-block; background: var(--surface3);
+      border: 1px solid var(--border); border-radius: 5px;
+      padding: 0.1rem 0.45rem; font-family: var(--mono);
+      font-size: 0.72rem; color: var(--amber);
+    }
+    .hidden { display: none !important; }
+
+    footer {
+      text-align: center; padding: 2rem; color: var(--muted);
+      font-size: 0.8rem; border-top: 1px solid var(--border); margin-top: 2rem;
+    }
+
+    /* Operations Console */
+    .ops-console {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 1.25rem 2rem 1.5rem;
+    }
+    .ops-console-inner { max-width: 1400px; margin: 0 auto; }
+    .ops-header {
+      display: flex; flex-wrap: wrap; align-items: flex-start;
+      justify-content: space-between; gap: 1rem; margin-bottom: 1rem;
+    }
+    .ops-header h2 {
+      font-size: 1.15rem; font-weight: 700; letter-spacing: 0.04em;
+      text-transform: uppercase; margin: 0; color: var(--text);
+    }
+    .ops-header-meta {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 0.65rem;
+      font-size: 0.78rem; color: var(--muted);
+    }
+    .ops-status-pill {
+      font-weight: 700; font-size: 0.72rem; letter-spacing: 0.06em;
+      padding: 0.2rem 0.55rem; border-radius: 4px; border: 1px solid var(--border);
+    }
+    .ops-status-pill.HEALTHY { color: var(--green); border-color: rgba(52,211,153,0.45); background: rgba(52,211,153,0.08); }
+    .ops-status-pill.DEGRADED { color: var(--amber); border-color: rgba(251,191,36,0.45); background: rgba(251,191,36,0.08); }
+    .ops-status-pill.CRITICAL { color: var(--red); border-color: rgba(248,113,113,0.45); background: rgba(248,113,113,0.08); }
+    .ops-status-pill.UNKNOWN { color: var(--muted); }
+    .ops-score { font-family: var(--mono); color: var(--accent); font-weight: 600; }
+    .ops-refresh-btn {
+      background: var(--surface2); border: 1px solid var(--border);
+      color: var(--text); border-radius: 6px; padding: 0.35rem 0.75rem;
+      font-size: 0.78rem; font-weight: 600; cursor: pointer; font-family: var(--font);
+    }
+    .ops-refresh-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .ops-refresh-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .ops-refresh-btn.running { opacity: 0.7; pointer-events: none; }
+    .ops-stale-warn {
+      font-size: 0.75rem; color: var(--amber); margin-bottom: 0.75rem;
+      padding: 0.45rem 0.65rem; border: 1px solid rgba(251,191,36,0.35);
+      border-radius: 6px; background: rgba(251,191,36,0.06); display: none;
+    }
+    .ops-stale-warn.show { display: block; }
+    .ops-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.65rem; margin-bottom: 1rem;
+    }
+    .ops-card {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 8px; padding: 0.75rem 0.85rem; min-height: 6.5rem;
+      display: flex; flex-direction: column; gap: 0.35rem;
+    }
+    .ops-card-head {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em;
+      color: var(--muted); font-weight: 600;
+    }
+    .ops-card-status { font-family: var(--mono); font-size: 0.78rem; font-weight: 600; }
+    .ops-card-status.ok { color: var(--green); }
+    .ops-card-status.warn { color: var(--amber); }
+    .ops-card-status.bad { color: var(--red); }
+    .ops-card-metric { font-size: 0.82rem; color: var(--text); font-weight: 500; }
+    .ops-card-diag { font-size: 0.72rem; color: var(--muted); line-height: 1.4; flex: 1; }
+    .ops-card-action {
+      align-self: flex-start; margin-top: 0.25rem;
+      background: transparent; border: 1px solid var(--border);
+      color: var(--accent); border-radius: 4px; padding: 0.2rem 0.5rem;
+      font-size: 0.68rem; cursor: pointer; font-family: var(--font);
+    }
+    .ops-card-action:hover { border-color: var(--accent); background: rgba(91,156,255,0.08); }
+    .ops-card-action:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+    .ops-modules-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 0.4rem; margin-bottom: 1rem;
+    }
+    .ops-module-chip {
+      font-family: var(--mono); font-size: 0.68rem;
+      padding: 0.35rem 0.5rem; border-radius: 5px;
+      border: 1px solid var(--border); background: var(--surface2);
+      display: flex; justify-content: space-between; align-items: center; gap: 0.35rem;
+    }
+    .ops-module-chip .ops-module-name { color: var(--text); text-transform: capitalize; }
+    .ops-module-chip .ops-module-state { font-weight: 600; font-size: 0.62rem; text-transform: uppercase; }
+    .ops-module-chip.healthy { border-color: rgba(52,211,153,0.35); }
+    .ops-module-chip.healthy .ops-module-state { color: var(--green); }
+    .ops-module-chip.unavailable { border-color: rgba(248,113,113,0.25); opacity: 0.85; }
+    .ops-module-chip.unavailable .ops-module-state { color: var(--red); }
+    .ops-cap-list { font-size: 0.68rem; color: var(--muted); margin-top: 0.15rem; line-height: 1.45; }
+    .ops-cap-item.ok { color: var(--green); }
+    .ops-cap-item.missing { color: var(--amber); }
+    .ops-section-title {
+      font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.07em;
+      color: var(--muted); margin: 0.85rem 0 0.45rem; font-weight: 600;
+    }
+    .ops-actions {
+      display: flex; flex-wrap: wrap; gap: 0.4rem;
+    }
+    .ops-action-btn {
+      background: var(--surface2); border: 1px solid var(--border);
+      color: var(--text); border-radius: 6px; padding: 0.38rem 0.65rem;
+      font-size: 0.74rem; cursor: pointer; font-family: var(--font);
+      transition: border-color 0.12s, background 0.12s;
+    }
+    .ops-action-btn:hover { border-color: var(--accent); }
+    .ops-action-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .ops-action-btn.running { border-color: var(--amber); color: var(--amber); }
+    .ops-action-btn.success { border-color: var(--green); color: var(--green); }
+    .ops-action-btn.failed { border-color: var(--red); color: var(--red); }
+    .ops-events-wrap {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 8px; overflow: hidden; margin-top: 0.5rem;
+    }
+    .ops-events-toolbar {
+      display: flex; flex-wrap: wrap; gap: 0.35rem; padding: 0.5rem 0.65rem;
+      border-bottom: 1px solid var(--border); background: var(--surface2);
+    }
+    .ops-filter-btn {
+      background: transparent; border: 1px solid var(--border);
+      color: var(--muted); border-radius: 4px; padding: 0.2rem 0.5rem;
+      font-size: 0.68rem; cursor: pointer; font-family: var(--font);
+    }
+    .ops-filter-btn.active { color: var(--accent); border-color: var(--accent); }
+    .ops-events-list {
+      max-height: 220px; overflow-y: auto; font-family: var(--mono);
+      font-size: 0.7rem; line-height: 1.45;
+    }
+    .ops-event-row {
+      display: grid; grid-template-columns: 9rem 4.5rem 6rem 1fr;
+      gap: 0.5rem; padding: 0.35rem 0.65rem; border-bottom: 1px solid var(--border);
+      color: var(--muted);
+    }
+    .ops-event-row:last-child { border-bottom: none; }
+    .ops-event-row.sev-error { color: var(--red); }
+    .ops-event-row.sev-warning { color: var(--amber); }
+    .ops-event-row.sev-success { color: var(--green); }
+    .ops-diagnostics {
+      margin-top: 0.5rem; background: var(--bg); border: 1px solid var(--border);
+      border-radius: 8px; padding: 0.65rem 0.85rem;
+      font-family: var(--mono); font-size: 0.72rem; color: var(--muted);
+      white-space: pre-wrap; line-height: 1.5;
+    }
+    .ops-diagnostics-actions { margin-top: 0.45rem; display: flex; gap: 0.4rem; flex-wrap: wrap; }
+    @media (max-width: 720px) {
+      .ops-event-row { grid-template-columns: 1fr; gap: 0.15rem; }
+      .ops-console { padding: 1rem; }
+    }
+
+    /* Interactive Walkthrough */
+    .wt-artifact {
+      background: linear-gradient(180deg, #0d1118 0%, var(--bg) 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 1.5rem 2rem 2rem;
+    }
+    .wt-inner { max-width: 1400px; margin: 0 auto; }
+    .wt-top {
+      display: flex; flex-wrap: wrap; align-items: flex-start;
+      justify-content: space-between; gap: 1rem; margin-bottom: 1.25rem;
+    }
+    .wt-top h2 {
+      font-size: 1.35rem; font-weight: 700; letter-spacing: -0.02em; margin: 0;
+    }
+    .wt-top p { color: var(--muted); font-size: 0.88rem; margin: 0.35rem 0 0; max-width: 52rem; }
+    .wt-progress-wrap { min-width: 200px; flex: 1; max-width: 320px; }
+    .wt-progress-label {
+      display: flex; justify-content: space-between; font-size: 0.72rem;
+      color: var(--muted); margin-bottom: 0.35rem; text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .wt-progress-bar {
+      height: 8px; background: var(--surface2); border-radius: 999px;
+      overflow: hidden; border: 1px solid var(--border);
+    }
+    .wt-progress-fill {
+      height: 100%; background: var(--green); border-radius: 999px;
+      width: 0%; transition: width 0.35s ease;
+    }
+    .wt-phases {
+      display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1rem;
+    }
+    .wt-phase-btn {
+      background: var(--surface2); border: 1px solid var(--border);
+      color: var(--muted); border-radius: 999px; padding: 0.35rem 0.85rem;
+      font-size: 0.74rem; cursor: pointer; font-family: var(--font);
+    }
+    .wt-phase-btn.active { color: var(--accent); border-color: var(--accent); background: rgba(91,156,255,0.1); }
+    .wt-phase-btn.done { color: var(--green); border-color: rgba(52,211,153,0.4); }
+    .wt-layout {
+      display: grid; grid-template-columns: minmax(240px, 300px) 1fr;
+      gap: 1rem; align-items: start;
+    }
+    @media (max-width: 900px) { .wt-layout { grid-template-columns: 1fr; } }
+    .wt-step-list {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); max-height: 420px; overflow-y: auto;
+    }
+    .wt-step-item {
+      display: flex; align-items: flex-start; gap: 0.6rem;
+      padding: 0.65rem 0.85rem; border-bottom: 1px solid var(--border);
+      cursor: pointer; text-align: left; width: 100%;
+      background: transparent; border-left: 3px solid transparent;
+      font-family: var(--font); color: var(--text);
+    }
+    .wt-step-item:last-child { border-bottom: none; }
+    .wt-step-item:hover { background: var(--surface2); }
+    .wt-step-item.active { background: rgba(91,156,255,0.08); border-left-color: var(--accent); }
+    .wt-step-item.done .wt-step-num { background: rgba(52,211,153,0.2); color: var(--green); border-color: var(--green); }
+    .wt-step-item.optional { opacity: 0.85; }
+    .wt-step-num {
+      flex-shrink: 0; width: 1.4rem; height: 1.4rem; border-radius: 50%;
+      border: 1px solid var(--border); font-size: 0.65rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center; color: var(--muted);
+    }
+    .wt-step-item-title { font-size: 0.78rem; line-height: 1.35; }
+    .wt-step-item-sub { font-size: 0.68rem; color: var(--muted); margin-top: 0.15rem; }
+    .wt-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.25rem 1.35rem;
+      box-shadow: var(--shadow);
+    }
+    .wt-card-phase {
+      font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.07em;
+      color: var(--accent); margin-bottom: 0.35rem;
+    }
+    .wt-card h3 { font-size: 1.15rem; margin: 0 0 0.65rem; color: var(--text); }
+    .wt-card-body { color: var(--muted); font-size: 0.88rem; line-height: 1.6; margin-bottom: 1rem; }
+    .wt-live {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      font-size: 0.75rem; padding: 0.35rem 0.65rem; border-radius: 6px;
+      margin-bottom: 0.85rem; border: 1px solid var(--border);
+    }
+    .wt-live.done { color: var(--green); border-color: rgba(52,211,153,0.35); background: rgba(52,211,153,0.08); }
+    .wt-live.pending { color: var(--amber); border-color: rgba(251,191,36,0.35); background: rgba(251,191,36,0.08); }
+    .wt-live.optional { color: var(--muted); }
+    .wt-detail {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 8px; padding: 0.85rem 1rem; margin-bottom: 1rem;
+      font-size: 0.82rem; color: var(--muted);
+    }
+    .wt-detail code, .wt-detail kbd { font-family: var(--mono); font-size: 0.78rem; }
+    .wt-nav {
+      display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;
+    }
+    .wt-nav-btn {
+      background: var(--surface2); border: 1px solid var(--border);
+      color: var(--text); border-radius: 8px; padding: 0.5rem 0.9rem;
+      font-size: 0.8rem; font-weight: 600; cursor: pointer; font-family: var(--font);
+    }
+    .wt-nav-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .wt-nav-btn.primary { background: var(--accent); color: #0a0c10; border-color: var(--accent); }
+    .wt-nav-btn.primary:hover { background: var(--accent-dim); }
+    .wt-nav-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .wt-nav-btn.running { border-color: var(--amber); color: var(--amber); }
+    .wt-nav-btn.success { border-color: var(--green); color: var(--green); }
+    .wt-nav-btn.failed { border-color: var(--red); color: var(--red); }
+    .wt-complete-banner {
+      display: none; margin-top: 1rem; padding: 1rem 1.15rem;
+      border-radius: var(--radius); border: 1px solid rgba(52,211,153,0.35);
+      background: rgba(52,211,153,0.08); color: var(--green); font-size: 0.88rem;
+    }
+    .wt-complete-banner.show { display: block; }
+
+    .layout-zone-diagram {
+      font-family: var(--mono); font-size: 0.72rem; line-height: 1.5;
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 8px; padding: 0.85rem 1rem; margin: 0.75rem 0;
+      color: var(--muted); white-space: pre; overflow-x: auto;
+    }
+    .sidebar-mode-badge {
+      display: none; font-size: 0.68rem; padding: 0.15rem 0.5rem;
+      border-radius: 4px; border: 1px solid var(--amber);
+      color: var(--amber); background: rgba(251,191,36,0.08);
+    }
+    .sidebar-mode-badge.show { display: inline-flex; }
+    .action-block-section { margin-bottom: 1.25rem; }
+    .action-block-head {
+      display: flex; flex-wrap: wrap; align-items: baseline;
+      justify-content: space-between; gap: 0.5rem; margin-bottom: 0.5rem;
+    }
+    .action-block-tools {
+      display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.5rem; align-items: center;
+    }
+    .block-tool-btn {
+      background: var(--surface2); border: 1px solid var(--border);
+      color: var(--muted); border-radius: 6px; padding: 0.25rem 0.55rem;
+      font-size: 0.72rem; cursor: pointer; font-family: var(--font);
+    }
+    .block-tool-btn:hover { color: var(--accent); border-color: var(--accent); }
+    .block-add-form {
+      display: none; margin-top: 0.5rem; padding: 0.75rem;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px; gap: 0.5rem;
+    }
+    .block-add-form.open { display: grid; grid-template-columns: 1fr 1fr; }
+    .block-add-form label { font-size: 0.72rem; color: var(--muted); display: block; margin-bottom: 0.2rem; }
+    .block-add-form input, .block-add-form select {
+      width: 100%; background: var(--bg); border: 1px solid var(--border);
+      border-radius: 6px; padding: 0.4rem 0.55rem; color: var(--text);
+      font-family: var(--font); font-size: 0.8rem;
+    }
+    .block-add-form .form-span-2 { grid-column: 1 / -1; }
+    .hotkey-item { position: relative; }
+    .hotkey-item .item-remove {
+      position: absolute; top: 0.35rem; right: 0.35rem;
+      width: 1.1rem; height: 1.1rem; border-radius: 4px;
+      border: 1px solid var(--border); background: var(--bg);
+      color: var(--muted); font-size: 0.75rem; line-height: 1;
+      cursor: pointer; opacity: 0; transition: opacity 0.12s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .hotkey-item:hover .item-remove, .hotkey-item:focus-within .item-remove { opacity: 1; }
+    .hotkey-item .item-remove:hover { color: var(--red); border-color: var(--red); }
+    @media (max-width: 900px) {
+      .ops-cards { grid-template-columns: 1fr; }
+      .wt-layout { grid-template-columns: 1fr; }
+      .ops-console-inner, .wt-inner, main { max-width: 100%; }
+      .hero-inner { max-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <h1>🐉 BlackDragon Automation Guide</h1>
+    <p class="subtitle">Professional interactive reference for Hammerspoon auto-tiling, named layouts, Ghostty Terminal Ops, and your Apple Silicon dev workflow. Click any action to run it live.</p>
+    <div class="hero-meta">
+      <span class="badge live">● Live actions via hammerspoon://</span>
+      <span class="badge">layouts.lua · named workspaces</span>
+      <span class="badge">~/.hammerspoon</span>
+      <span class="badge">⌘⌃H to reopen</span>
+    </div>
+    <div class="hero-actions">
+      <button class="hero-btn" type="button" data-action="terminal-ops" onclick="runAction(this)">Launch Terminal Ops</button>
+      <button class="hero-btn ghost" type="button" data-action="reload" onclick="runAction(this)">Reload Config</button>
+      <button class="hero-btn ghost" type="button" onclick="switchTab('layouts')">Named layouts</button>
+      <button class="hero-btn ghost" type="button" onclick="scrollToWalkthrough()">Setup walkthrough</button>
+      <button class="hero-btn ghost" type="button" onclick="switchTab('start')">First-time setup</button>
+    </div>
+  </div>
+</div>
+
+<section class="ops-console" id="operations-console" aria-label="Operations Console">
+  <div class="ops-console-inner">
+    <div class="ops-header">
+      <div>
+        <h2>Operations Console</h2>
+        <div class="ops-header-meta">
+          <span>BlackDragon local dashboard</span>
+          <span id="ops-last-refresh">Last refresh: —</span>
+          <span class="sidebar-mode-badge" id="sidebar-mode-badge">Sidebar mode</span>
+          <span class="ops-score" id="ops-health-score">—/100</span>
+          <span class="ops-status-pill UNKNOWN" id="ops-overall-status">UNKNOWN</span>
+        </div>
+      </div>
+      <button type="button" class="ops-refresh-btn" id="ops-refresh-btn">Refresh</button>
+    </div>
+    <div class="ops-stale-warn" id="ops-stale-warn" role="status">Status may be stale — last refresh is older than 30 seconds or unreadable.</div>
+
+    <div class="ops-cards" id="ops-service-cards" aria-live="polite"></div>
+
+    <div class="ops-section-title">Module Health</div>
+    <div class="ops-modules-grid" id="ops-modules-grid" aria-live="polite"></div>
+
+    <div class="ops-section-title">Quick Actions</div>
+    <div class="ops-actions" id="ops-quick-actions"></div>
+
+    <div class="ops-section-title">Event Stream</div>
+    <div class="ops-events-wrap">
+      <div class="ops-events-toolbar" role="toolbar" aria-label="Event filters">
+        <button type="button" class="ops-filter-btn active" data-filter="all">All</button>
+        <button type="button" class="ops-filter-btn" data-filter="errors">Errors</button>
+        <button type="button" class="ops-filter-btn" data-filter="warnings">Warnings</button>
+        <button type="button" class="ops-filter-btn" data-filter="actions">Actions</button>
+      </div>
+      <div class="ops-events-list" id="ops-events-list" aria-live="polite"></div>
+    </div>
+
+    <div class="ops-section-title">Diagnostics Summary</div>
+    <div class="ops-diagnostics" id="ops-diagnostics">Loading…</div>
+    <div class="ops-diagnostics-actions">
+      <button type="button" class="ops-action-btn" data-ops-action="copy_diagnostics">Copy diagnostics</button>
+      <button type="button" class="ops-action-btn" data-ops-action="open_event_log">Open event log</button>
+      <button type="button" class="ops-action-btn" data-ops-action="clear_event_display">Clear event display</button>
+    </div>
+  </div>
+</section>
+
+<section class="wt-artifact" id="walkthrough" aria-label="Interactive Setup Walkthrough">
+  <div class="wt-inner">
+    <div class="wt-top">
+      <div>
+        <h2>Interactive Setup Walkthrough</h2>
+        <p>Live-guided path from Phase 1 validation → environment fixes → daily workflow. Steps auto-detect from your Operations Console status; mark manual steps when done.</p>
+      </div>
+      <div class="wt-progress-wrap">
+        <div class="wt-progress-label">
+          <span>Progress</span>
+          <span id="wt-progress-text">0%</span>
+        </div>
+        <div class="wt-progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+          <div class="wt-progress-fill" id="wt-progress-fill"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wt-phases" id="wt-phases" role="tablist" aria-label="Walkthrough phases"></div>
+
+    <div class="wt-layout">
+      <div class="wt-step-list" id="wt-step-list" role="listbox" aria-label="Walkthrough steps"></div>
+      <div class="wt-card" id="wt-current-card">
+        <div class="wt-card-phase" id="wt-card-phase">—</div>
+        <h3 id="wt-card-title">Loading walkthrough…</h3>
+        <div class="wt-live pending" id="wt-live-badge">● Checking status…</div>
+        <div class="wt-card-body" id="wt-card-body"></div>
+        <div class="wt-detail" id="wt-card-detail"></div>
+        <div class="wt-nav">
+          <button type="button" class="wt-nav-btn" id="wt-prev-btn">← Previous</button>
+          <button type="button" class="wt-nav-btn primary" id="wt-action-btn" hidden>Run action</button>
+          <button type="button" class="wt-nav-btn" id="wt-mark-btn">Mark complete</button>
+          <button type="button" class="wt-nav-btn" id="wt-skip-btn" hidden>Skip (optional)</button>
+          <button type="button" class="wt-nav-btn primary" id="wt-next-btn">Next →</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="wt-complete-banner" id="wt-complete-banner">
+      All required steps complete. Your console should reflect a healthier score. Pin this guide and use <strong>Copy diagnostics</strong> when troubleshooting.
+    </div>
+  </div>
+</section>
+
+<nav class="tabs" role="tablist">
+  <button data-tab="walkthrough" role="tab" onclick="scrollToWalkthrough()">Walkthrough</button>
+  <button class="active" data-tab="start" role="tab">Start Here</button>
+  <button data-tab="hotkeys" role="tab">Hotkeys</button>
+  <button data-tab="layouts" role="tab">Layouts</button>
+  <button data-tab="tips" role="tab">Pro Tips</button>
+  <button data-tab="workflows" role="tab">Workflows</button>
+  <button data-tab="terminal" role="tab">Terminal Ops</button>
+  <button data-tab="integrations" role="tab">Integrations</button>
+  <button data-tab="console" role="tab">Console</button>
+</nav>
+
+<main>
+
+  <!-- START HERE -->
+  <section id="start" class="panel active" role="tabpanel">
+    <h2>Start Here</h2>
+    <p class="section-lead">Complete this checklist once. Progress is saved in your browser.</p>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3>Setup checklist</h3>
+        <ul class="checklist" id="setup-checklist">
+          <li data-id="accessibility"><input type="checkbox"><span><strong>Grant Accessibility</strong> — System Settings → Privacy &amp; Security → Accessibility → Hammerspoon</span></li>
+          <li data-id="automation"><input type="checkbox"><span><strong>Grant Automation</strong> — Allow Hammerspoon to control Ghostty, Terminal, and browsers when prompted</span></li>
+          <li data-id="reload"><input type="checkbox"><span><strong>Reload config</strong> — Menu bar → Hammerspoon → Reload Config (or <kbd>⌘⌃R</kbd>)</span></li>
+          <li data-id="guide"><input type="checkbox"><span><strong>Open this guide</strong> — <kbd>⌘⌃H</kbd> anytime</span></li>
+          <li data-id="layouts"><input type="checkbox"><span><strong>Verify displays</strong> — Console: <code>require('modules.verify').run()</code> or click Verify below</span></li>
+          <li data-id="ops"><input type="checkbox"><span><strong>Test Terminal Ops</strong> — Press <kbd>⌘⌃5</kbd> or click Launch above</span></li>
+          <li data-id="zshrc"><input type="checkbox"><span><strong>Shell alias</strong> — Run <code>source ~/.zshrc</code> then try <code>ops-center</code></span></li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Architecture at a glance</h3>
+        <table>
+          <thead><tr><th>Layer</th><th>Tool</th><th>Role</th></tr></thead>
+          <tbody>
+            <tr><td>Layouts</td><td>layouts.lua</td><td>Named workspaces (Coding, AI, Ops, Writing)</td></tr>
+            <tr><td>Auto-tile</td><td>windows.lua</td><td>Per-display columns (ultrawide) / stack (built-in)</td></tr>
+            <tr><td>Hotkeys</td><td>Hammerspoon</td><td>Triggers actions instantly</td></tr>
+            <tr><td>Terminal</td><td>Ghostty Ops Center</td><td>5-tab live dashboard</td></tr>
+            <tr><td>Project</td><td>AI_Engineering_OS</td><td>Pane overrides via <code>.terminal-ops/</code></td></tr>
+            <tr><td>AI</td><td>ai.lua + Ollama</td><td>Clipboard handoff &amp; local models</td></tr>
+            <tr><td>Automation</td><td>n8n webhooks</td><td>Background workflows</td></tr>
+          </tbody>
+        </table>
+        <div class="alert-box success">
+          <strong>Project path:</strong> <code>~/Documents/GitHub/AI_Engineering_OS</code> — canonical default. Set <code>TERMINAL_OPS_PROJECT_DIR</code> to override.
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Module map</h3>
+      <table>
+        <thead><tr><th>Module</th><th>Responsibility</th></tr></thead>
+        <tbody>
+          <tr><td><span class="module-tag">layouts.lua</span></td><td>Named workspace layouts (Coding, AI, Ops, Writing) + menu bar picker</td></tr>
+          <tr><td><span class="module-tag">verify.lua</span></td><td>Display and layout diagnostics</td></tr>
+          <tr><td><span class="module-tag">windows.lua</span></td><td>Auto-tiler (per-display columns/stack), snap, center, toggle &amp; cycle</td></tr>
+          <tr><td><span class="module-tag">hotkeys.lua</span></td><td>Central hotkey registry</td></tr>
+          <tr><td><span class="module-tag">paths.lua</span></td><td>Canonical project path (<code>Documents/GitHub/AI_Engineering_OS</code>)</td></tr>
+          <tr><td><span class="module-tag">apps.lua</span></td><td>Launch BlackDragon, Notes, Cursor, Codex, Claude, iTerm, IBKR</td></tr>
+          <tr><td><span class="module-tag">terminal_ops.lua</span></td><td>Ghostty 5-tab operations layout</td></tr>
+          <tr><td><span class="module-tag">clipboard.lua</span></td><td>20-item pasteboard history</td></tr>
+          <tr><td><span class="module-tag">ai.lua</span></td><td>AI clipboard handoff (never auto-submits)</td></tr>
+          <tr><td><span class="module-tag">n8n.lua</span></td><td>HTTP webhooks to localhost:5678</td></tr>
+          <tr><td><span class="module-tag">guide.lua</span></td><td>This guide — <code>hammerspoon://guide</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- HOTKEYS -->
+  <section id="hotkeys" class="panel" role="tabpanel">
+    <h2>Hotkey Reference</h2>
+    <p class="section-lead">Click any row to run the action live. Use <strong>+ Add</strong> / <strong>×</strong> to customize each block (saved in this browser).</p>
+    <div class="search-wrap">
+      <input type="search" id="hotkey-search" placeholder="Search… snap, ghostty, clipboard, chatgpt">
+    </div>
+
+    <div id="hotkey-blocks-root"></div>
+  </section>
+
+  <!-- LAYOUTS -->
+  <section id="layouts" class="panel" role="tabpanel">
+    <h2>Named Layouts — layouts.lua</h2>
+    <p class="section-lead">Code-defined workspaces in <code>~/.hammerspoon/modules/layouts.lua</code>. One hotkey launches apps, positions windows, hides clutter, and pauses the auto-tiler during placement.</p>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3>Division of labor</h3>
+        <table>
+          <thead><tr><th>Task</th><th>Tool</th></tr></thead>
+          <tbody>
+            <tr><td>Summon Coding / AI / Writing workspace</td><td><strong>layouts.lua</strong> <kbd>⌘⌃⇧1-4</kbd></td></tr>
+            <tr><td>AG493 Command Center / Dev Console</td><td><strong>layouts.lua</strong> <kbd>⌘⌃⇧5-6</kbd></td></tr>
+            <tr><td>Auto-arrange on window open/close</td><td><strong>windows.lua</strong> auto-tiler</td></tr>
+            <tr><td>Nudge one window left/right</td><td>Hammerspoon Hyper keys</td></tr>
+            <tr><td>Terminal Ops dashboard</td><td><kbd>⌘⌃5</kbd> or layout Ops <kbd>⌘⌃⇧3</kbd></td></tr>
+          </tbody>
+        </table>
+        <div class="alert-box success" style="margin-top:0.75rem">
+          <strong>Ultrawide (3840×1080):</strong> equal columns. <strong>Built-in Retina:</strong> master + stack. Toggle with <kbd>⌘⌃T</kbd>, cycle mode with <kbd>⌘⌃L</kbd>.
+        </div>
+      </div>
+      <div class="card">
+        <h3>Authoring new layouts</h3>
+        <table>
+          <thead><tr><th>Console command</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr><td><code>require('modules.layouts').dumpScreen()</code></td><td>Print window list for current screen</td></tr>
+            <tr><td><code>require('modules.verify').run()</code></td><td>Verify displays + layout catalog</td></tr>
+            <tr><td>Edit <code>layouts.lua</code></td><td>Add apps + position recipes (<code>left50</code>, <code>col2of3</code>, etc.)</td></tr>
+            <tr><td><code>docs/TUNING_NOTES.md</code></td><td>Log friction during your first week</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>AG493QS4R4 Command Center (3840×1080)</h3>
+      <p style="font-size:0.88rem;color:var(--muted);margin-bottom:0.75rem">Optimized for your 32:9 ultrawide. Use <strong>Command Center</strong> while running the walkthrough; use <strong>Dev Console</strong> for Lua debugging.</p>
+      <div class="layout-zone-diagram">Command Center (⌘⌃⇧5)
+┌──────────┬─────────────────────┬────────────────┐
+│ ChatGPT Atlas │ Cursor         │ Ghostty Ops    │
+│ ~20%     │ ~45%                │ ~35%           │
+│ Guide    │ Config edits        │ Terminal tabs  │
+└──────────┴─────────────────────┴────────────────┘
+
+Dev Console (⌘⌃⇧6)
+┌─────────────────────┬────────────────┬──────────┐
+│ Cursor              │ Ghostty Ops    │ HS Console│
+│ ~45%                │ ~35%           │ ~20%     │
+└─────────────────────┴────────────────┴──────────┘</div>
+      <div id="block-layouts-ag493" class="hotkey-grid"></div>
+      <div class="alert-box info" style="margin-top:0.75rem">
+        <strong>Sidebar mode:</strong> When the guide is in ChatGPT Atlas's left column (~768px), cards stack vertically automatically. Use <kbd>⌘⌃T</kbd> to disable auto-tile if windows drift after layout apply.
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Live actions</h3>
+      <div id="layouts-blocks-root"></div>
+    </div>
+
+    <div class="code-block">
+      <span class="lang-tag">lua</span>
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre>-- Hammerspoon console
+require('modules.layouts').apply('coding')
+require('modules.layouts').dumpScreen()
+require('modules.verify').run()
+require('modules.windows').toggleAutoTile()</pre>
+    </div>
+  </section>
+
+  <!-- PRO TIPS -->
+  <section id="tips" class="panel" role="tabpanel">
+    <h2>Pro Tips</h2>
+    <p class="section-lead">Practices that make the automation stack reliable on Apple Silicon + dual monitors.</p>
+
+    <div class="alert-box info">
+      <strong>Golden rule:</strong> One pane for action, one pane for proof. Launch Terminal Ops (<kbd>⌘⌃5</kbd>), jump to the relevant tab, keep logs visible while you work.
+    </div>
+
+    <div class="grid-3">
+      <div class="tip-card"><div class="tip-icon">⚡</div><h4>Auto-reload on save</h4><p>Any file change under <code>~/.hammerspoon/</code> reloads config via <code>hs.pathwatcher</code>. No restart needed.</p></div>
+      <div class="tip-card"><div class="tip-icon">📋</div><h4>Clipboard safety</h4><p>AI hotkeys restore your original clipboard after 2 seconds. Nothing auto-submits to ChatGPT — you always paste manually.</p></div>
+      <div class="tip-card"><div class="tip-icon">🖥</div><h4>Hyper vs Mods</h4><p><kbd>⌘⌃⌥⇧</kbd> = windows. <kbd>⌘⌃</kbd> = apps &amp; utilities. <kbd>⌃⌥⌘</kbd> = AI (<kbd>O</kbd>/<kbd>S</kbd> console/summary). OpenClaw: <kbd>⌃⌥⌘U</kbd> UI, <kbd>⌃⌥⌘I</kbd> status.</p></div>
+      <div class="tip-card"><div class="tip-icon">🐉</div><h4>BlackDragon launch</h4><p><kbd>⌘⌃1</kbd> finds the latest Xcode DerivedData build. From repo: <code>./launch.sh release</code>.</p></div>
+      <div class="tip-card"><div class="tip-icon">👻</div><h4>Ghostty config</h4><p>Add to <code>~/.config/ghostty/config</code>: <code>config-file = {home}/.hammerspoon/scripts/ghostty/ghostty-terminal-ops-center.conf</code></p></div>
+      <div class="tip-card"><div class="tip-icon">🔧</div><h4>Custom panes</h4><p>Add <code>pane_my-id()</code> functions in your repo's <code>.terminal-ops/pane.sh</code>. BlackDragon already ships overrides.</p></div>
+      <div class="tip-card"><div class="tip-icon">🤖</div><h4>Local AI</h4><p>Tab 2 runs <code>ollama serve</code>. Shell: <code>startai</code> / <code>stopai</code> from <code>~/.zshrc</code>. Pipe logs: <code>cat err.log | ollama run llama3 "summarize"</code></p></div>
+      <div class="tip-card"><div class="tip-icon">🔗</div><h4>n8n bridge</h4><p>Run n8n on <code>localhost:5678</code>. Trigger from console: <code>require('modules.n8n').trigger('hs/daily-log')</code></p></div>
+      <div class="tip-card"><div class="tip-icon">📐</div><h4>layouts.lua = workspaces</h4><p>Edit <code>~/.hammerspoon/modules/layouts.lua</code>. Summon with <kbd>⌘⌃⇧1-4</kbd> or menu bar 🗂. Dump current screen with <code>layouts.dumpScreen()</code>.</p></div>
+      <div class="tip-card"><div class="tip-icon">🪟</div><h4>Hyper = quick snap</h4><p><kbd>⌘⌃⌥⇧</kbd> arrows snap the focused window only. For full workspace restore, use named layouts (<kbd>⌘⌃⇧1-6</kbd>) or <code>layouts.apply('coding')</code> — not Hyper keys.</p></div>
+      <div class="tip-card"><div class="tip-icon">🔄</div><h4>Ops-center alias</h4><p><code>ops-center</code> in shell equals <kbd>⌘⌃5</kbd>. Override project: <code>TERMINAL_OPS_PROJECT_DIR=~/repo ops-center</code></p></div>
+      <div class="tip-card"><div class="tip-icon">📝</div><h4>Project snapshots</h4><p><kbd>⌃⌥⌘P</kbd> writes a markdown snapshot to iCloud Obsidian — one file per minute, no duplicates.</p></div>
+      <div class="tip-card"><div class="tip-icon">🛠</div><h4>Troubleshooting</h4><p>Ghostty fails? Check Automation permission. Project missing? Verify <code>~/Documents/GitHub/AI_Engineering_OS</code> exists or set <code>TERMINAL_OPS_PROJECT_DIR</code>.</p></div>
+    </div>
+
+    <div class="card" style="margin-top:1rem">
+      <h3>When things break</h3>
+      <table>
+        <thead><tr><th>Symptom</th><th>Fix</th></tr></thead>
+        <tbody>
+          <tr><td>Hotkeys silent</td><td>Accessibility → enable Hammerspoon → Reload Config</td></tr>
+          <tr><td>Ghostty won't open</td><td>Automation → Hammerspoon → Ghostty → Allow</td></tr>
+          <tr><td>Terminal Ops: project dir not found</td><td>Check <code>TERMINAL_OPS_PROJECT_DIR</code> or clone project locally</td></tr>
+          <tr><td>AI: no text selected</td><td>Highlight text first; refocus app within 2s after hotkey</td></tr>
+          <tr><td>n8n HTTP error</td><td>Start n8n; confirm webhook path matches workflow</td></tr>
+          <tr><td>Layout wrong after apply</td><td>Increase <code>placementPause</code> in layouts.lua; run <code>layouts.dumpScreen()</code> to re-author positions</td></tr>
+          <tr><td>Dialogs get tiled</td><td>Add app to <code>excludedApps</code> or title pattern in windows.lua</td></tr>
+          <tr><td>Guide buttons no-op</td><td>Hammerspoon must be running; open guide via ChatGPT Atlas not Chrome file:// quirks</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- WORKFLOWS -->
+  <section id="workflows" class="panel" role="tabpanel">
+    <h2>Worked Examples</h2>
+    <p class="section-lead">Click to expand. Simulators preview behavior; action buttons run for real.</p>
+
+    <div class="card example open" id="ex1">
+      <div class="example-header" onclick="toggleExample('ex1')">
+        <span class="example-num">1</span>
+        <div><div class="example-title">Split-screen coding setup</div><div class="example-sub">Cursor left · iTerm right · under 5 seconds</div></div>
+        <span class="chevron">▾</span>
+      </div>
+      <div class="example-body">
+        <ol class="steps">
+          <li><kbd>⌘⌃3</kbd> — launch Cursor</li>
+          <li><kbd>⌘⌃⌥⇧←</kbd> — snap left half</li>
+          <li><kbd>⌘⌃4</kbd> — launch iTerm</li>
+          <li><kbd>⌘⌃⌥⇧→</kbd> — snap right half</li>
+        </ol>
+        <div class="simulator">
+          <h4>Layout simulator</h4>
+          <div id="layout-preview" style="display:flex;gap:4px;height:72px;margin-bottom:0.75rem;border:1px solid var(--border);border-radius:8px;overflow:hidden">
+            <div id="pane-left" style="flex:1;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:0.75rem;color:var(--muted)">empty</div>
+            <div id="pane-right" style="flex:1;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:0.75rem;color:var(--muted)">empty</div>
+          </div>
+          <button class="sim-btn" onclick="simLayout('cursor-left')">Cursor + Snap ←</button>
+          <button class="sim-btn" onclick="simLayout('terminal-right')">iTerm + Snap →</button>
+          <button class="sim-btn secondary" onclick="simLayout('reset')">Reset</button>
+          <div class="sim-output empty" id="layout-output">Click to simulate…</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card example open" id="ex-coding-layout">
+      <div class="example-header" onclick="toggleExample('ex-coding-layout')">
+        <span class="example-num">★</span>
+        <div><div class="example-title">Summon your Coding layout in one key</div><div class="example-sub">modules/layouts.lua · full workspace mode</div></div>
+        <span class="chevron">▾</span>
+      </div>
+      <div class="example-body">
+        <p style="margin-bottom:0.75rem">Same result as Example 1 — but as a single hotkey. Launches Cursor and Ghostty if not running, positions them, hides everything else, pauses the auto-tiler so nothing fights the placement.</p>
+        <ol class="steps">
+          <li><kbd>⌘⌃⇧1</kbd> — apply <strong>Coding</strong> layout on the screen under your cursor</li>
+          <li>Cursor snaps to the left half, Ghostty to the right (falls back to Terminal if Ghostty isn't installed)</li>
+          <li>Non-layout apps are hidden — no visual noise</li>
+          <li>The tiler auto-pauses for ~2.5s so it doesn't undo the placement</li>
+        </ol>
+        <div class="simulator">
+          <h4>Coding layout preview</h4>
+          <div id="layout-coding-preview" style="display:flex;gap:4px;height:72px;margin-bottom:0.75rem;border:1px solid var(--border);border-radius:8px;overflow:hidden">
+            <div style="flex:1;background:rgba(91,156,255,0.2);display:flex;align-items:center;justify-content:center;font-size:0.75rem;color:var(--muted);border-radius:6px">Cursor</div>
+            <div style="flex:1;background:rgba(52,211,153,0.15);display:flex;align-items:center;justify-content:center;font-size:0.75rem;color:var(--muted);border-radius:6px">Ghostty</div>
+          </div>
+          <button class="sim-btn" type="button" data-action="layout-apply" data-layout="coding" onclick="runAction && runAction(this)">▶ Apply Coding now</button>
+          <button class="sim-btn secondary" type="button" data-action="layout-apply" data-layout="ai_workflow" onclick="runAction && runAction(this)">▶ Apply AI Workflow</button>
+          <button class="sim-btn secondary" type="button" data-action="tile-toggle" onclick="runAction && runAction(this)">▶ Toggle auto-tile</button>
+          <div class="sim-output empty" id="layout-coding-output">Click a button to run live.</div>
+        </div>
+        <p style="margin-top:0.75rem;font-size:0.82rem;color:var(--muted)">Layouts live in <code>~/.hammerspoon/modules/layouts.lua</code>. Edit the table to add your own. Menu bar icon <span style="font-size:1rem">🗂</span> lists all layouts.</p>
+      </div>
+    </div>
+
+    <div class="card example" id="ex2">
+      <div class="example-header" onclick="toggleExample('ex2')">
+        <span class="example-num">2</span>
+        <div><div class="example-title">Morning dev ritual</div><div class="example-sub">BlackDragon + Terminal Ops + Notes</div></div>
+        <span class="chevron">▾</span>
+      </div>
+      <div class="example-body">
+        <ol class="steps">
+          <li><kbd>⌘⌃5</kbd> — open Ghostty Ops Center (backend + AI panes boot automatically)</li>
+          <li><kbd>⌘⌃1</kbd> — launch BlackDragon app</li>
+          <li><kbd>⌘⌃3</kbd> — open Cursor on your active feature branch</li>
+          <li><kbd>⌘⌃2</kbd> — Apple Notes for notes alongside</li>
+          <li>In Ghostty Tab 1: orchestration pane runs <code>./launch.sh release</code>; telemetry streams BlackDragon logs</li>
+        </ol>
+        <button class="sim-btn" type="button" data-action="terminal-ops" onclick="runAction(this)">▶ Run: Launch Terminal Ops</button>
+        <button class="sim-btn secondary" type="button" data-action="launch" data-app="BlackDragon" onclick="runAction(this)">▶ Run: BlackDragon</button>
+      </div>
+    </div>
+
+    <div class="card example" id="ex3">
+      <div class="example-header" onclick="toggleExample('ex3')">
+        <span class="example-num">3</span>
+        <div><div class="example-title">Explain selected text with AI</div><div class="example-sub">Clipboard handoff · modules/ai.lua</div></div>
+        <span class="chevron">▾</span>
+      </div>
+      <div class="example-body">
+        <ol class="steps">
+          <li>Highlight confusing text anywhere</li>
+          <li><kbd>⌃⌥⌘G</kbd> — builds explain prompt, opens ChatGPT</li>
+          <li>Paste with <kbd>⌘V</kbd> — original clipboard restored after 2s</li>
+        </ol>
+        <div class="simulator">
+          <h4>Prompt preview</h4>
+          <textarea id="ai-selection" rows="3" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:0.65rem;color:var(--text);font-size:0.875rem;margin-bottom:0.75rem">The aggregate root enforces invariants across the bounded context.</textarea>
+          <button class="sim-btn" onclick="simAI('explain')">Preview Explain</button>
+          <button class="sim-btn secondary" onclick="simAI('codex')">Preview Code Review</button>
+          <button class="sim-btn secondary" type="button" data-action="ai-explain" onclick="runHotkeyAction(this)">▶ Run live</button>
+          <div class="sim-output empty" id="ai-output">Preview or run live…</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card example" id="ex4">
+      <div class="example-header" onclick="toggleExample('ex4')">
+        <span class="example-num">4</span>
+        <div><div class="example-title">Trigger n8n from Hammerspoon</div><div class="example-sub">Webhook bridge · modules/n8n.lua</div></div>
+        <span class="chevron">▾</span>
+      </div>
+      <div class="example-body">
+        <div class="alert-box warn">n8n must run at <code>http://localhost:5678</code> with a matching Webhook path.</div>
+        <ol class="steps">
+          <li>Create n8n workflow with Webhook path <code>hs/daily-log</code></li>
+          <li>Console: <code>require('modules.n8n').post('hs/daily-log', {event='focus'})</code></li>
+          <li>Watch for ✅ on-screen alert</li>
+        </ol>
+        <div class="simulator">
+          <select id="webhook-path" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:0.5rem;color:var(--text);font-family:var(--mono);font-size:0.85rem;margin-bottom:0.75rem">
+            <option value="hs/daily-log">hs/daily-log</option>
+          </select>
+          <button class="sim-btn" onclick="simWebhook('get')">Simulate GET</button>
+          <button class="sim-btn secondary" onclick="simWebhook('post')">Simulate POST</button>
+          <button class="sim-btn secondary" type="button" data-action="n8n-post" data-path="hs/daily-log" onclick="runAction(this)">▶ Run live POST</button>
+          <div class="sim-output empty" id="webhook-output">Enter path…</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card example" id="ex5">
+      <div class="example-header" onclick="toggleExample('ex5')">
+        <span class="example-num">5</span>
+        <div><div class="example-title">Incident response in Terminal Ops</div><div class="example-sub">Control + telemetry side by side</div></div>
+        <span class="chevron">▾</span>
+      </div>
+      <div class="example-body">
+        <ol class="steps">
+          <li><kbd>⌘⌃5</kbd> — open Ops Center</li>
+          <li><kbd>⌘1</kbd> in Ghostty — Backend tab: orchestration + log stream</li>
+          <li><kbd>⌘4</kbd> — Automation tab: worker logs + queue health</li>
+          <li><kbd>⌘5</kbd> — Git tab: <code>git status</code> + recent commits</li>
+          <li><kbd>⌘⇧Z</kbd> — zoom the pane that needs focus; <kbd>⌘⇧E</kbd> equalize when done</li>
+        </ol>
+        <button class="sim-btn" type="button" data-action="terminal-ops" onclick="runAction(this)">▶ Launch Ops Center now</button>
+      </div>
+    </div>
+
+    <div class="card example" id="ex6">
+      <div class="example-header" onclick="toggleExample('ex6')">
+        <span class="example-num">6</span>
+        <div><div class="example-title">Restore dev workspace with layouts</div><div class="example-sub">One hotkey · apps positioned · auto-tiler paused</div></div>
+        <span class="chevron">▾</span>
+      </div>
+      <div class="example-body">
+        <ol class="steps">
+          <li>Open this guide — <kbd>⌘⌃H</kbd></li>
+          <li>Press <kbd>⌘⌃⇧1</kbd> for Coding (Cursor + Ghostty) or <kbd>⌘⌃⇧2</kbd> on ultrawide for AI Workflow</li>
+          <li>Wait for apps to launch and position (~2–3 seconds)</li>
+          <li><kbd>⌘⌃5</kbd> — layer Terminal Ops on top for logs and orchestration</li>
+          <li>Tweak one window? Use Hyper snap — log changes in <code>docs/TUNING_NOTES.md</code></li>
+        </ol>
+        <button class="sim-btn" type="button" data-action="layout-apply" data-layout="coding" onclick="runAction(this)">▶ Apply Coding layout</button>
+        <button class="sim-btn secondary" type="button" data-action="terminal-ops" onclick="runAction(this)">▶ Then: Terminal Ops</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- TERMINAL OPS -->
+  <section id="terminal" class="panel" role="tabpanel">
+    <h2>Terminal Operations Center</h2>
+    <p class="section-lead">Ghostty as a live dashboard — not a passive shell. Click a tab to see pane details.</p>
+
+    <div class="alert-box info">
+      <strong>Launch:</strong> <kbd>⌘⌃5</kbd> · <code>ops-center</code> · project: <code>~/Documents/GitHub/AI_Engineering_OS</code> (override: <code>TERMINAL_OPS_PROJECT_DIR</code>)
+    </div>
+
+    <button class="sim-btn" type="button" data-action="terminal-ops" onclick="runAction(this)" style="margin-bottom:1rem">▶ Launch Terminal Ops Center</button>
+
+    <div class="ops-topology" id="ops-tabs">
+      <div class="ops-tab active" data-tab="1" onclick="selectOpsTab(1)"><div class="tab-num">Tab 1</div><div class="tab-name">Backend</div><div class="tab-panes">Orchestration · Telemetry</div></div>
+      <div class="ops-tab" data-tab="2" onclick="selectOpsTab(2)"><div class="tab-num">Tab 2</div><div class="tab-name">AI / Ollama</div><div class="tab-panes">Model ops · Eval</div></div>
+      <div class="ops-tab" data-tab="3" onclick="selectOpsTab(3)"><div class="tab-num">Tab 3</div><div class="tab-name">Data</div><div class="tab-panes">SwiftData · Redis N/A</div></div>
+      <div class="ops-tab" data-tab="4" onclick="selectOpsTab(4)"><div class="tab-num">Tab 4</div><div class="tab-name">Automation</div><div class="tab-panes">Workers · Queue health</div></div>
+      <div class="ops-tab" data-tab="5" onclick="selectOpsTab(5)"><div class="tab-num">Tab 5</div><div class="tab-name">Git / Deploy</div><div class="tab-panes">Status · Logs</div></div>
+    </div>
+    <div class="ops-detail" id="ops-detail">Tab 1 — Backend: Left pane runs <code>./launch.sh release</code>. Right pane streams <code>com.personal.blackdragon</code> subsystem logs.</div>
+
+    <div class="card">
+      <h3>Ghostty keybinds (inside Ops window)</h3>
+      <table>
+        <thead><tr><th>Keys</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td><kbd>⌘↵</kbd></td><td>Split right</td></tr>
+          <tr><td><kbd>⌘⇧↵</kbd></td><td>Split down</td></tr>
+          <tr><td><kbd>⌘H/J/K/L</kbd></td><td>Jump splits</td></tr>
+          <tr><td><kbd>⌘⇧Z</kbd></td><td>Zoom active split</td></tr>
+          <tr><td><kbd>⌘⇧E</kbd></td><td>Equalize splits</td></tr>
+          <tr><td><kbd>⌘⇧R</kbd></td><td>Reload Ghostty config</td></tr>
+          <tr><td><kbd>⌘1…5</kbd></td><td>Jump domain tabs</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="code-block">
+      <span class="lang-tag">ghostty config</span>
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre># Add to ~/.config/ghostty/config:
+config-file = {home}/.hammerspoon/scripts/ghostty/ghostty-terminal-ops-center.conf</pre>
+    </div>
+  </section>
+
+  <!-- INTEGRATIONS -->
+  <section id="integrations" class="panel" role="tabpanel">
+    <h2>Integrations</h2>
+    <p class="section-lead">Click a row for a starter snippet.</p>
+    <table id="integrations-table">
+      <thead><tr><th>Integration</th><th>API</th><th>Use case</th></tr></thead>
+      <tbody>
+        <tr data-snippet="layouts" style="cursor:pointer"><td>Layouts</td><td><code>modules.layouts</code></td><td>Named window workspaces</td></tr>
+        <tr data-snippet="n8n" style="cursor:pointer"><td>n8n</td><td><code>hs.http</code></td><td>Workflow automation</td></tr>
+        <tr data-snippet="applescript" style="cursor:pointer"><td>AppleScript</td><td><code>hs.osascript</code></td><td>App control (Ghostty)</td></tr>
+        <tr data-snippet="km" style="cursor:pointer"><td>Keyboard Maestro</td><td><code>hs.urlevent</code></td><td>Macro triggers</td></tr>
+        <tr data-snippet="notify" style="cursor:pointer"><td>Notifications</td><td><code>hs.notify</code></td><td>Async feedback</td></tr>
+        <tr data-snippet="mqtt" style="cursor:pointer"><td>MQTT</td><td><code>hs.mqtt</code></td><td>Smart home</td></tr>
+        <tr data-snippet="websocket" style="cursor:pointer"><td>WebSockets</td><td><code>hs.websocket</code></td><td>Live dashboards</td></tr>
+        <tr data-snippet="shortcuts" style="cursor:pointer"><td>Shortcuts / Siri</td><td><code>shortcuts://</code></td><td>Voice triggers</td></tr>
+      </tbody>
+    </table>
+    <div class="code-block">
+      <span class="lang-tag">lua</span>
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre id="integration-code">-- Click a row above</pre>
+    </div>
+  </section>
+
+  <!-- CONSOLE -->
+  <section id="console" class="panel" role="tabpanel">
+    <h2>Hammerspoon Console</h2>
+    <p class="section-lead">Menu bar → Hammerspoon → Console. Paste commands below.</p>
+    <div class="code-block">
+      <span class="lang-tag">console</span>
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre>hs.reload()
+require('modules.terminal_ops').launch()
+require('modules.apps').launch('BlackDragon')
+require('modules.clipboard').showHistory()
+require('modules.n8n').trigger('hs/daily-log')
+require('modules.guide').open()
+require('modules.layouts').apply('coding')
+require('modules.layouts').dumpScreen()
+require('modules.verify').run()
+require('modules.windows').toggleAutoTile()</pre>
+    </div>
+    <div class="simulator">
+      <input type="text" id="console-cmd" value="require('modules.terminal_ops').launch()" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:0.65rem;color:var(--text);font-family:var(--mono);font-size:0.85rem;margin-bottom:0.75rem">
+      <button class="sim-btn" onclick="runConsoleCmd()">Copy command</button>
+      <div class="sim-output empty" id="console-output">Ready…</div>
+    </div>
+  </section>
+
+</main>
+
+<div id="action-toast" class="action-toast" role="status" aria-live="polite"></div>
+
+<footer>
+  BlackDragon Hammerspoon · <code>~/.hammerspoon/docs/USER_GUIDE.html</code> · <kbd>⌘⌃H</kbd>
+</footer>
+
+<script>
+  // ── Operations Console ───────────────────────────────────────────────────
+  const OPS_POLL_MS = 10000;
+  const OPS_STALE_MS = 30000;
+  const OPS_STATUS_URL = '../runtime/operations_status.json';
+  const OPS_EVENTS_URL = '../runtime/operations_events.json';
+
+  let opsPollTimer = null;
+  let opsEventFilter = 'all';
+  let opsLastStatus = null;
+  let opsLastEvents = [];
+  let opsStatusLoaded = false;
+  let wtCurrentIndex = 0;
+  let wtInitialized = false;
+  let wtManual = JSON.parse(localStorage.getItem('bd-wt-manual') || '{}');
+  let wtSkipped = JSON.parse(localStorage.getItem('bd-wt-skipped') || '{}');
+
+  const WT_PHASES = [
+    { id: 'validate', label: '1 · Validate' },
+    { id: 'fix', label: '2 · Fix environment' },
+    { id: 'integrate', label: '3 · Integrate' },
+    { id: 'advance', label: '4 · Next steps' },
+  ];
+
+  const WALKTHROUGH_STEPS = [
+    {
+      id: 'hs-running', phase: 'validate',
+      title: 'Hammerspoon is running',
+      body: 'The Operations Console module must load without errors. Check the Hammerspoon menu bar icon is present.',
+      detail: 'Console should log <code>operations: operations console started</code> after reload.',
+      detect: s => s?.hammerspoon?.status === 'running' ? 'done' : 'pending',
+    },
+    {
+      id: 'status-json', phase: 'validate',
+      title: 'Status JSON is loading',
+      body: 'This page reads <code>runtime/operations_status.json</code> every 10 seconds. If stale warnings appear, click Refresh.',
+      detail: 'Use ChatGPT Atlas for guide and layout browsing. Chrome may block local <code>file://</code> JSON.',
+      detect: (_, ctx) => ctx.statusLoaded ? 'done' : 'pending',
+    },
+    {
+      id: 'accessibility', phase: 'validate',
+      title: 'Accessibility permission granted',
+      body: 'Hammerspoon needs Accessibility for window tiling, AI clipboard capture, and automation.',
+      detail: 'System Settings → Privacy &amp; Security → Accessibility → enable <strong>Hammerspoon</strong>.',
+      detect: s => s?.hammerspoon?.accessibility === true ? 'done' : 'pending',
+    },
+    {
+      id: 'reload-stable', phase: 'validate',
+      title: 'Reload loop is fixed',
+      body: 'After one reload, the “WE ARE READY, MOTHER FUCKER” alert should not repeat every few seconds.',
+      detail: 'Path watcher now ignores <code>runtime/</code> writes. Press <kbd>⌘⌃R</kbd> once to confirm.',
+      manual: true,
+      action: 'reload_hammerspoon', actionLabel: 'Reload config',
+    },
+    {
+      id: 'run-verify', phase: 'validate',
+      title: 'Run layout verification',
+      body: 'Verify detects your ultrawide vs built-in displays and confirms layout catalog.',
+      detail: 'Runs <code>require(\'modules.verify\').run()</code> — results appear in Hammerspoon Console.',
+      action: 'run_verification', actionLabel: 'Run verify',
+      detect: (_, ctx) => (ctx.events || []).some(e => e.action === 'run_verification' && e.success) ? 'done' : 'pending',
+    },
+    {
+      id: 'project-path', phase: 'fix',
+      title: 'BlackDragon project path exists',
+      body: 'Terminal Ops and project health checks expect the BlackDragon project directory.',
+      detail: 'Expected: <code>~/Documents/GitHub/AI_Engineering_OS</code><br>Or set env <code>TERMINAL_OPS_PROJECT_DIR</code>. Legacy <code>01_Projects</code> is used as fallback if present.',
+      action: 'open_project_folder', actionLabel: 'Open project folder',
+      detect: s => s?.services?.project?.path_exists ? 'done' : 'pending',
+    },
+    {
+      id: 'ghostty-config', phase: 'fix',
+      title: 'Ghostty config file exists',
+      body: 'Ghostty should include the Terminal Ops center config snippet.',
+      detail: 'Create <code>~/.config/ghostty/config</code> with:<br><code>config-file = {home}/.hammerspoon/scripts/ghostty/ghostty-terminal-ops-center.conf</code>',
+      action: 'open_ghostty_config', actionLabel: 'Open Ghostty config',
+      detect: s => s?.services?.ghostty?.config_exists ? 'done' : 'pending',
+    },
+    {
+      id: 'ghostty-running', phase: 'fix',
+      title: 'Ghostty is running',
+      body: 'Launch Ghostty and grant Automation permission when Hammerspoon requests it.',
+      detail: 'Install from <code>/Applications/Ghostty.app</code> if missing.',
+      action: 'launch_terminal_ops', actionLabel: 'Launch Terminal Ops',
+      detect: s => s?.services?.ghostty?.status === 'running' ? 'done' : 'pending',
+    },
+    {
+      id: 'terminal-ops-config', phase: 'fix',
+      title: 'Terminal Ops config present',
+      body: 'The Ghostty pane layout config ships with Hammerspoon.',
+      detail: 'File: <code>~/.hammerspoon/scripts/ghostty/ghostty-terminal-ops-center.conf</code>',
+      action: 'open_terminal_ops_config', actionLabel: 'Open Ops config',
+      detect: s => s?.services?.ghostty?.terminal_ops_config_exists ? 'done' : 'pending',
+    },
+    {
+      id: 'ollama', phase: 'fix', optional: true,
+      title: 'Ollama reachable (optional)',
+      body: 'Local AI models on port 11434. Skip if you only use cloud AI clipboard handoff.',
+      action: 'refresh_status', actionLabel: 'Recheck Ollama',
+      detect: s => s?.services?.ollama?.endpoint_reachable ? 'done' : 'pending',
+    },
+    {
+      id: 'n8n', phase: 'fix', optional: true,
+      title: 'n8n reachable (optional)',
+      body: 'Workflow webhooks on port 5678. Skip if you do not run n8n locally.',
+      action: 'refresh_status', actionLabel: 'Recheck n8n',
+      detect: s => s?.services?.n8n?.endpoint_reachable ? 'done' : 'pending',
+    },
+    {
+      id: 'command-center-layout', phase: 'integrate',
+      title: 'Apply Command Center layout (AG493QS4R4)',
+      body: 'Positions ChatGPT Atlas (guide), Cursor, and Ghostty at 20/45/35 on your 3840×1080 ultrawide.',
+      detail: 'Display: <code>AG493QS4R4</code> · Hotkey <kbd>⌘⌃⇧5</kbd> · Opens USER_GUIDE in ChatGPT Atlas automatically.',
+      action: 'apply_command_center_layout', actionLabel: 'Apply Command Center',
+      detect: (_, ctx) => (ctx.events || []).some(e => e.action === 'apply_command_center_layout') ? 'done' : 'pending',
+    },
+    {
+      id: 'test-layout', phase: 'integrate',
+      title: 'Apply a named layout',
+      body: 'Test that layout switching works on your ultrawide display.',
+      detail: 'Try <kbd>⌘⌃⇧1</kbd> for Coding or click below.',
+      action: 'apply_coding_layout', actionLabel: 'Apply Coding layout',
+      detect: (_, ctx) => (ctx.events || []).some(e => e.action === 'apply_coding_layout') ? 'done' : 'pending',
+    },
+    {
+      id: 'test-terminal-ops', phase: 'integrate',
+      title: 'Launch Terminal Ops Center',
+      body: 'Opens the 5-tab Ghostty operations layout in your project directory.',
+      detail: 'Hotkey: <kbd>⌘⌃5</kbd>',
+      action: 'launch_terminal_ops', actionLabel: 'Launch Terminal Ops',
+      detect: (_, ctx) => (ctx.events || []).some(e => e.action === 'launch_terminal_ops' && e.success) ? 'done' : 'pending',
+    },
+    {
+      id: 'test-hotkeys', phase: 'integrate', manual: true,
+      title: 'Confirm hotkeys respond',
+      body: 'Test at least: <kbd>⌘⌃H</kbd> guide, <kbd>⌘⌃T</kbd> auto-tile, <kbd>⌘⌃R</kbd> reload.',
+      detail: 'See Hotkeys tab for the full list. Each should trigger a visible Hammerspoon action.',
+    },
+    {
+      id: 'copy-diagnostics', phase: 'integrate',
+      title: 'Copy diagnostics snapshot',
+      body: 'Practice the troubleshooting workflow — paste into Cursor or a bug report.',
+      action: 'copy_diagnostics', actionLabel: 'Copy diagnostics',
+      detect: (_, ctx) => (ctx.events || []).some(e => e.action === 'copy_diagnostics' && e.success) ? 'done' : 'pending',
+    },
+    {
+      id: 'event-stream', phase: 'integrate',
+      title: 'Event stream is recording',
+      body: 'Actions routed through the Operations Console appear in the event list above.',
+      detect: (_, ctx) => (ctx.events || []).length >= 2 ? 'done' : 'pending',
+    },
+    {
+      id: 'pin-guide', phase: 'advance', manual: true,
+      title: 'Pin this guide',
+      body: 'Bookmark or keep this file open as your daily operations dashboard.',
+      detail: '<code>file:///Users/&lt;you&gt;/.hammerspoon/docs/USER_GUIDE.html</code> · reopen with <kbd>⌘⌃H</kbd>',
+    },
+    {
+      id: 'git-commit', phase: 'advance', manual: true,
+      title: 'Commit your working config',
+      body: 'Save a git snapshot once everything works.',
+      detail: '<code>cd ~/.hammerspoon && git status && git add -A && git commit -m "ops console stable"</code>',
+    },
+    {
+      id: 'phase2-ready', phase: 'advance',
+      title: 'Ready for Phase 2',
+      body: 'Phase 0 and Phase 1 are complete. When health is DEGRADED or better, the next milestone is Phase 2: built-in diagnostics and self-test (verify module, guided fixes, score history). Command palette and layout recorder follow in later phases.',
+      detect: s => {
+        const st = s?.overall?.status;
+        return (st === 'HEALTHY' || st === 'DEGRADED') ? 'done' : 'pending';
+      },
+    },
+  ];
+
+  function scrollToWalkthrough() {
+    document.getElementById('walkthrough')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.querySelectorAll('nav.tabs button').forEach(b => b.classList.toggle('active', b.dataset.tab === 'walkthrough'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  }
+
+  function wtStepState(step, status, ctx) {
+    if (wtSkipped[step.id]) return 'done';
+    if (step.manual && wtManual[step.id]) return 'done';
+    if (step.detect) {
+      const d = step.detect(status, ctx);
+      if (d === 'done') return 'done';
+    }
+    return step.optional ? 'optional' : 'pending';
+  }
+
+  function wtSaveManual() {
+    localStorage.setItem('bd-wt-manual', JSON.stringify(wtManual));
+    localStorage.setItem('bd-wt-skipped', JSON.stringify(wtSkipped));
+  }
+
+  function wtRequiredSteps() {
+    return WALKTHROUGH_STEPS.filter(s => !s.optional);
+  }
+
+  function wtProgress(status, ctx) {
+    const required = wtRequiredSteps();
+    const done = required.filter(s => wtStepState(s, status, ctx) === 'done').length;
+    return Math.round((done / required.length) * 100);
+  }
+
+  function wtRenderPhases(status, ctx) {
+    const el = document.getElementById('wt-phases');
+    if (!el) return;
+    el.innerHTML = WT_PHASES.map(ph => {
+      const steps = WALKTHROUGH_STEPS.filter(s => s.phase === ph.id);
+      const allDone = steps.every(s => wtStepState(s, status, ctx) === 'done' || s.optional);
+      return `<button type="button" class="wt-phase-btn${wtCurrentIndex >= 0 && WALKTHROUGH_STEPS[wtCurrentIndex]?.phase === ph.id ? ' active' : ''}${allDone ? ' done' : ''}" data-phase="${ph.id}">${escapeHtml(ph.label)}</button>`;
+    }).join('');
+    el.querySelectorAll('.wt-phase-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = WALKTHROUGH_STEPS.findIndex(s => s.phase === btn.dataset.phase);
+        if (idx >= 0) { wtCurrentIndex = idx; wtRenderWalkthrough(status, ctx); }
+      });
+    });
+  }
+
+  function wtRenderStepList(status, ctx) {
+    const el = document.getElementById('wt-step-list');
+    if (!el) return;
+    el.innerHTML = WALKTHROUGH_STEPS.map((step, i) => {
+      const state = wtStepState(step, status, ctx);
+      const sub = state === 'done' ? 'Complete' : (step.optional ? 'Optional' : 'Pending');
+      return `<button type="button" class="wt-step-item${i === wtCurrentIndex ? ' active' : ''}${state === 'done' ? ' done' : ''}${step.optional ? ' optional' : ''}" data-idx="${i}" role="option">
+        <span class="wt-step-num">${i + 1}</span>
+        <span><div class="wt-step-item-title">${escapeHtml(step.title)}</div><div class="wt-step-item-sub">${sub}</div></span>
+      </button>`;
+    }).join('');
+    el.querySelectorAll('.wt-step-item').forEach(btn => {
+      btn.addEventListener('click', () => {
+        wtCurrentIndex = parseInt(btn.dataset.idx, 10);
+        wtRenderWalkthrough(status, ctx);
+      });
+    });
+  }
+
+  function wtRenderCurrentCard(status, ctx) {
+    const step = WALKTHROUGH_STEPS[wtCurrentIndex];
+    if (!step) return;
+    const state = wtStepState(step, status, ctx);
+    const phase = WT_PHASES.find(p => p.id === step.phase);
+
+    document.getElementById('wt-card-phase').textContent = phase ? phase.label : step.phase;
+    document.getElementById('wt-card-title').textContent = step.title;
+    document.getElementById('wt-card-body').textContent = step.body;
+    document.getElementById('wt-card-detail').innerHTML = step.detail || '';
+
+    const badge = document.getElementById('wt-live-badge');
+    badge.className = 'wt-live ' + (state === 'done' ? 'done' : (step.optional ? 'optional' : 'pending'));
+    badge.textContent = state === 'done' ? '● Complete' : (step.optional ? '○ Optional — skip if not needed' : '● Pending — action required');
+
+    const actionBtn = document.getElementById('wt-action-btn');
+    if (step.action) {
+      actionBtn.hidden = false;
+      actionBtn.textContent = step.actionLabel || 'Run action';
+      actionBtn.dataset.opsAction = step.action;
+    } else {
+      actionBtn.hidden = true;
+      delete actionBtn.dataset.opsAction;
+    }
+
+    document.getElementById('wt-skip-btn').hidden = !step.optional;
+    document.getElementById('wt-mark-btn').hidden = !step.manual;
+    document.getElementById('wt-prev-btn').disabled = wtCurrentIndex <= 0;
+    document.getElementById('wt-next-btn').disabled = wtCurrentIndex >= WALKTHROUGH_STEPS.length - 1;
+
+    const pct = wtProgress(status, ctx);
+    document.getElementById('wt-progress-text').textContent = pct + '%';
+    document.getElementById('wt-progress-fill').style.width = pct + '%';
+    document.querySelector('.wt-progress-bar')?.setAttribute('aria-valuenow', String(pct));
+
+    const banner = document.getElementById('wt-complete-banner');
+    banner?.classList.toggle('show', pct === 100);
+  }
+
+  function wtRenderWalkthrough(status, ctx) {
+    wtRenderPhases(status, ctx);
+    wtRenderStepList(status, ctx);
+    wtRenderCurrentCard(status, ctx);
+  }
+
+  function wtBindNav(status, ctx) {
+    if (document.getElementById('wt-current-card')?.dataset.bound) return;
+    document.getElementById('wt-current-card').dataset.bound = '1';
+
+    document.getElementById('wt-prev-btn')?.addEventListener('click', () => {
+      if (wtCurrentIndex > 0) { wtCurrentIndex--; wtRenderWalkthrough(opsLastStatus, { statusLoaded: opsStatusLoaded, events: opsLastEvents }); }
+    });
+    document.getElementById('wt-next-btn')?.addEventListener('click', () => {
+      if (wtCurrentIndex < WALKTHROUGH_STEPS.length - 1) {
+        wtCurrentIndex++;
+        wtRenderWalkthrough(opsLastStatus, { statusLoaded: opsStatusLoaded, events: opsLastEvents });
+      }
+    });
+    document.getElementById('wt-mark-btn')?.addEventListener('click', () => {
+      const step = WALKTHROUGH_STEPS[wtCurrentIndex];
+      if (step) { wtManual[step.id] = true; wtSaveManual(); wtRenderWalkthrough(opsLastStatus, { statusLoaded: opsStatusLoaded, events: opsLastEvents }); showToast('Marked complete'); }
+    });
+    document.getElementById('wt-skip-btn')?.addEventListener('click', () => {
+      const step = WALKTHROUGH_STEPS[wtCurrentIndex];
+      if (step?.optional) { wtSkipped[step.id] = true; wtSaveManual(); wtRenderWalkthrough(opsLastStatus, { statusLoaded: opsStatusLoaded, events: opsLastEvents }); showToast('Skipped optional step'); }
+    });
+    document.getElementById('wt-action-btn')?.addEventListener('click', function() {
+      const action = this.dataset.opsAction;
+      if (action) {
+        handleOpsActionClick(this);
+        setTimeout(() => loadOpsData(), 1500);
+      }
+    });
+  }
+
+  function initWalkthrough() {
+    if (wtInitialized) return;
+    wtInitialized = true;
+    const ctx = { statusLoaded: opsStatusLoaded, events: opsLastEvents };
+    const firstPending = WALKTHROUGH_STEPS.findIndex(s => wtStepState(s, opsLastStatus, ctx) !== 'done');
+    wtCurrentIndex = firstPending >= 0 ? firstPending : 0;
+    wtBindNav();
+    wtRenderWalkthrough(opsLastStatus, ctx);
+  }
+
+  const OPS_QUICK_ACTIONS = [
+    { action: 'launch_terminal_ops', label: 'Terminal Ops' },
+    { action: 'reload_hammerspoon', label: 'Reload Config' },
+    { action: 'open_guide', label: 'Open Guide' },
+    { action: 'apply_coding_layout', label: 'Coding Layout' },
+    { action: 'apply_ai_layout', label: 'AI Layout' },
+    { action: 'apply_ops_layout', label: 'Ops Layout' },
+    { action: 'apply_writing_layout', label: 'Writing Layout' },
+    { action: 'apply_command_center_layout', label: 'Command Center' },
+    { action: 'apply_dev_console_layout', label: 'Dev Console' },
+    { action: 'toggle_auto_tile', label: 'Toggle Auto-tile' },
+    { action: 'run_verification', label: 'Run Verify' },
+    { action: 'open_hammerspoon_console', label: 'HS Console' },
+    { action: 'open_hammerspoon_folder', label: 'HS Folder' },
+    { action: 'open_project_folder', label: 'Project Folder' },
+  ];
+
+  function updateSidebarModeBadge() {
+    const badge = document.getElementById('sidebar-mode-badge');
+    if (badge) badge.classList.toggle('show', window.innerWidth < 900);
+  }
+
+  function escapeHtml(str) {
+    return String(str ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function buildOpsURL(action) {
+    return 'hammerspoon://operations?action=' + encodeURIComponent(action);
+  }
+
+  function fireOpsAction(action, label) {
+    const url = buildOpsURL(action);
+    showToast('▶ ' + (label || action));
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = url;
+    document.body.appendChild(iframe);
+    setTimeout(() => iframe.remove(), 1000);
+  }
+
+  function parseIsoMs(iso) {
+    if (!iso) return NaN;
+    const t = Date.parse(iso);
+    return Number.isFinite(t) ? t : NaN;
+  }
+
+  async function fetchLocalJson(url) {
+    const res = await fetch(url + '?t=' + Date.now(), { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    return res.json();
+  }
+
+  function statusClass(level) {
+    if (level === 'ok') return 'ok';
+    if (level === 'warn') return 'warn';
+    return 'bad';
+  }
+
+  function formatCapabilityList(caps) {
+    if (!caps || typeof caps !== 'object') return '';
+    return Object.entries(caps).map(([key, ok]) => {
+      const label = key.replace(/_/g, ' ');
+      const cls = ok ? 'ok' : 'missing';
+      return `<span class="ops-cap-item ${cls}">${escapeHtml(label)}: ${ok ? 'yes' : 'no'}</span>`;
+    }).join(' · ');
+  }
+
+  function renderOpsModules(status) {
+    const el = document.getElementById('ops-modules-grid');
+    if (!el) return;
+    const modules = status.modules || {};
+    const keys = Object.keys(modules).sort();
+    if (!keys.length) {
+      el.innerHTML = '<span class="ops-module-chip unavailable"><span class="ops-module-name">—</span><span class="ops-module-state">none</span></span>';
+      return;
+    }
+    el.innerHTML = keys.map(name => {
+      const state = modules[name] === 'healthy' ? 'healthy' : 'unavailable';
+      const label = name.replace(/_/g, ' ');
+      return `<div class="ops-module-chip ${state}" title="${escapeHtml(name)}">
+        <span class="ops-module-name">${escapeHtml(label)}</span>
+        <span class="ops-module-state">${escapeHtml(modules[name] || 'unknown')}</span>
+      </div>`;
+    }).join('');
+  }
+
+  function renderOpsCards(status) {
+    const el = document.getElementById('ops-service-cards');
+    if (!el) return;
+    const hs = status.hammerspoon || {};
+    const svc = status.services || {};
+    const ghostty = svc.ghostty || {};
+    const ollama = svc.ollama || {};
+    const n8n = svc.n8n || {};
+    const lmStudio = svc.lm_studio || {};
+    const openclaw = svc.openclaw || {};
+    const project = svc.project || {};
+    const displays = status.displays || {};
+
+    const cards = [
+      {
+        title: 'Hammerspoon',
+        status: hs.status === 'running' ? 'Running' : 'Unknown',
+        level: hs.status === 'running' ? 'ok' : 'warn',
+        metric: 'Last reload: ' + (hs.last_reload || '—'),
+        diag: (hs.accessibility === false ? 'Accessibility off · ' : '')
+          + (hs.screen_count || '?') + ' displays'
+          + (status.generated_at ? ' · status ' + status.generated_at.replace('T', ' ').slice(0, 19) : ''),
+        action: 'open_hammerspoon_console',
+        actionLabel: 'Console',
+      },
+      {
+        title: 'Ghostty',
+        status: ghostty.status || 'unknown',
+        level: ghostty.status === 'running' ? 'ok' : 'warn',
+        metric: 'PID count: ' + (ghostty.pid_count ?? 0),
+        diag: ghostty.diagnostic || (ghostty.config_exists ? 'Config OK' : 'Config missing'),
+        action: 'launch_terminal_ops',
+        actionLabel: 'Launch Ops',
+      },
+      {
+        title: 'Ollama',
+        status: ollama.endpoint_reachable ? 'reachable' : (ollama.status || 'unknown'),
+        level: ollama.endpoint_reachable ? 'ok' : 'warn',
+        metric: ollama.models && ollama.models.length ? ollama.models.length + ' models' : 'No models listed',
+        diag: ollama.failure_reason || 'localhost:11434',
+        action: 'refresh_status',
+        actionLabel: 'Recheck',
+      },
+      {
+        title: 'n8n',
+        status: n8n.endpoint_reachable ? 'reachable' : (n8n.status || 'degraded'),
+        level: n8n.endpoint_reachable ? 'ok' : 'warn',
+        metric: n8n.process_detected ? 'process detected' : 'no process',
+        diag: n8n.failure_reason || 'localhost:5678',
+        action: 'refresh_status',
+        actionLabel: 'Recheck',
+      },
+      {
+        title: 'LM Studio',
+        status: lmStudio.endpoint_reachable ? 'reachable' : (lmStudio.status || 'unknown'),
+        level: lmStudio.endpoint_reachable ? 'ok' : 'warn',
+        metric: lmStudio.models && lmStudio.models.length ? lmStudio.models.length + ' models' : 'No models listed',
+        diag: lmStudio.failure_reason || 'localhost:1234/v1/models',
+        action: 'refresh_status',
+        actionLabel: 'Recheck',
+      },
+      {
+        title: 'OpenClaw',
+        status: openclaw.endpoint_reachable ? 'reachable' : (openclaw.status || 'unknown'),
+        level: openclaw.endpoint_reachable ? 'ok' : 'warn',
+        metric: openclaw.gateway_status || 'Gateway status unavailable',
+        diag: openclaw.failure_reason || 'localhost:18789',
+        action: 'refresh_status',
+        actionLabel: 'Recheck',
+      },
+      {
+        title: 'BlackDragon Project',
+        status: project.path_exists ? 'present' : 'missing',
+        level: project.path_exists ? 'ok' : 'bad',
+        metric: project.branch ? 'branch ' + project.branch : 'no branch',
+        diag: project.diagnostic || project.path || '—',
+        caps: formatCapabilityList(project.capabilities),
+        action: 'open_project_folder',
+        actionLabel: 'Open',
+      },
+      {
+        title: 'Displays & Layouts',
+        status: (displays.count || 0) + ' displays',
+        level: (displays.count || 0) >= 1 ? 'ok' : 'bad',
+        metric: displays.auto_tile_enabled ? 'auto-tile ON' : 'auto-tile OFF',
+        diag: 'Layout: ' + (displays.active_layout || 'none') + (displays.focused_display ? ' · focus ' + displays.focused_display : ''),
+        action: 'run_verification',
+        actionLabel: 'Verify',
+      },
+    ];
+
+    el.innerHTML = cards.map(c => `
+      <article class="ops-card">
+        <div class="ops-card-head"><span>${escapeHtml(c.title)}</span>
+          <span class="ops-card-status ${c.level}">${escapeHtml(c.status)}</span></div>
+        <div class="ops-card-metric">${escapeHtml(c.metric)}</div>
+        <div class="ops-card-diag">${escapeHtml(c.diag)}</div>
+        ${c.caps ? `<div class="ops-cap-list">${c.caps}</div>` : ''}
+        <button type="button" class="ops-card-action" data-ops-action="${escapeHtml(c.action)}">${escapeHtml(c.actionLabel)}</button>
+      </article>
+    `).join('');
+  }
+
+  function renderOpsHeader(status) {
+    const overall = status.overall || {};
+    const pill = document.getElementById('ops-overall-status');
+    const score = document.getElementById('ops-health-score');
+    const last = document.getElementById('ops-last-refresh');
+    const stale = document.getElementById('ops-stale-warn');
+    const label = overall.status || 'UNKNOWN';
+    if (pill) {
+      pill.textContent = label;
+      pill.className = 'ops-status-pill ' + label;
+    }
+    if (score) score.textContent = (overall.score ?? '—') + '/100';
+    if (last) last.textContent = 'Last refresh: ' + (status.generated_at || '—');
+    const age = Date.now() - parseIsoMs(status.generated_at);
+    if (stale) stale.classList.toggle('show', !Number.isFinite(age) || age > OPS_STALE_MS);
+  }
+
+  function renderOpsDiagnostics(status) {
+    const el = document.getElementById('ops-diagnostics');
+    if (!el) return;
+    el.textContent = status.diagnostics_text || 'No diagnostics available.';
+  }
+
+  function eventMatchesFilter(ev) {
+    if (opsEventFilter === 'all') return true;
+    if (opsEventFilter === 'errors') return ev.severity === 'error';
+    if (opsEventFilter === 'warnings') return ev.severity === 'warning';
+    if (opsEventFilter === 'actions') return !!ev.action;
+    return true;
+  }
+
+  function renderOpsEvents(events) {
+    const el = document.getElementById('ops-events-list');
+    if (!el) return;
+    const filtered = (events || []).filter(eventMatchesFilter);
+    if (!filtered.length) {
+      el.innerHTML = '<div class="ops-event-row"><span>No events</span></div>';
+      return;
+    }
+    el.innerHTML = filtered.map(ev => {
+      const sev = ev.severity || 'info';
+      const ts = (ev.timestamp || '').replace('T', ' ').slice(0, 19);
+      return `<div class="ops-event-row sev-${escapeHtml(sev)}">
+        <span>${escapeHtml(ts)}</span>
+        <span>${escapeHtml(sev)}</span>
+        <span>${escapeHtml(ev.source || '')}</span>
+        <span>${escapeHtml(ev.message || '')}</span>
+      </div>`;
+    }).join('');
+  }
+
+  function renderQuickActions() {
+    const el = document.getElementById('ops-quick-actions');
+    if (!el || el.dataset.bound) return;
+    el.dataset.bound = '1';
+    el.innerHTML = OPS_QUICK_ACTIONS.map(a =>
+      `<button type="button" class="ops-action-btn" data-ops-action="${escapeHtml(a.action)}">${escapeHtml(a.label)}</button>`
+    ).join('');
+  }
+
+  function setActionButtonState(btn, state) {
+    btn.classList.remove('running', 'success', 'failed');
+    if (state) btn.classList.add(state);
+  }
+
+  function handleOpsActionClick(btn) {
+    const action = btn.dataset.opsAction;
+    if (!action) return;
+    const label = btn.textContent.trim();
+    setActionButtonState(btn, 'running');
+    fireOpsAction(action, label);
+    setTimeout(() => {
+      setActionButtonState(btn, 'success');
+      if (action === 'refresh_status' || action === 'reload_hammerspoon') {
+        setTimeout(() => loadOpsData(), action === 'reload_hammerspoon' ? 3000 : 800);
+      } else {
+        setTimeout(() => loadOpsData(), 1200);
+      }
+      setTimeout(() => setActionButtonState(btn, ''), 2500);
+    }, 400);
+  }
+
+  async function loadOpsData() {
+    const refreshBtn = document.getElementById('ops-refresh-btn');
+    if (refreshBtn) refreshBtn.classList.add('running');
+    try {
+      const [status, events] = await Promise.all([
+        fetchLocalJson(OPS_STATUS_URL),
+        fetchLocalJson(OPS_EVENTS_URL).catch(() => []),
+      ]);
+      opsLastStatus = status;
+      opsLastEvents = Array.isArray(events) ? events : [];
+      opsStatusLoaded = true;
+      renderOpsHeader(status);
+      renderOpsCards(status);
+      renderOpsModules(status);
+      renderOpsDiagnostics(status);
+      renderOpsEvents(opsLastEvents);
+      wtRenderWalkthrough(status, { statusLoaded: true, events: opsLastEvents });
+      initWalkthrough();
+    } catch (err) {
+      opsStatusLoaded = false;
+      wtRenderWalkthrough(opsLastStatus, { statusLoaded: false, events: opsLastEvents });
+      if (!wtInitialized) initWalkthrough();
+      const stale = document.getElementById('ops-stale-warn');
+      if (stale) {
+        stale.textContent = 'Cannot read status JSON (' + err.message + '). Trigger Refresh or reload Hammerspoon.';
+        stale.classList.add('show');
+      }
+      const diag = document.getElementById('ops-diagnostics');
+      if (diag) diag.textContent = 'Status unavailable. Ensure Hammerspoon is running and operations_console is loaded.';
+    } finally {
+      if (refreshBtn) refreshBtn.classList.remove('running');
+    }
+  }
+
+  function initOperationsConsole() {
+    renderQuickActions();
+    document.getElementById('ops-refresh-btn')?.addEventListener('click', () => {
+      fireOpsAction('refresh_status', 'Refresh status');
+      setTimeout(loadOpsData, 900);
+    });
+    document.querySelector('.ops-console')?.addEventListener('click', e => {
+      const btn = e.target.closest('[data-ops-action]');
+      if (btn) handleOpsActionClick(btn);
+    });
+    document.querySelectorAll('.ops-filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.ops-filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        opsEventFilter = btn.dataset.filter || 'all';
+        renderOpsEvents(opsLastEvents);
+      });
+    });
+    loadOpsData();
+    updateSidebarModeBadge();
+    window.addEventListener('resize', updateSidebarModeBadge);
+    if (opsPollTimer) clearInterval(opsPollTimer);
+    opsPollTimer = setInterval(loadOpsData, OPS_POLL_MS);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      initOperationsConsole();
+      initActionBlocks();
+    });
+  } else {
+    initOperationsConsole();
+    initActionBlocks();
+  }
+
+  const OPS_DETAILS = {
+    1: 'Tab 1 — Backend: Left runs ./launch.sh release. Right streams com.personal.blackdragon logs.',
+    2: 'Tab 2 — AI: Left runs ollama serve. Right runs ./launch.sh test (eval suite).',
+    3: 'Tab 3 — Data: Left inspects SwiftData store. Right notes Redis N/A for BlackDragon.',
+    4: 'Tab 4 — Automation: Left streams sync category logs. Right watches notebooklm + github pollers.',
+    5: 'Tab 5 — Git: Left runs ./launch.sh build-rel. Right shows git log or commit stream.'
+  };
+
+  function selectOpsTab(n) {
+    document.querySelectorAll('.ops-tab').forEach(t => t.classList.toggle('active', t.dataset.tab == n));
+    document.getElementById('ops-detail').textContent = OPS_DETAILS[n];
+  }
+
+  function buildGuideURL(el) {
+    const action = el.dataset.action;
+    let url = 'hammerspoon://guide?action=' + encodeURIComponent(action);
+    if (el.dataset.app) url += '&app=' + encodeURIComponent(el.dataset.app);
+    if (el.dataset.path) url += '&path=' + encodeURIComponent(el.dataset.path);
+    if (el.dataset.layout) url += '&layout=' + encodeURIComponent(el.dataset.layout);
+    return url;
+  }
+
+  // ── Customizable action blocks ───────────────────────────────────────────
+  const ACTION_BLOCKS_KEY = 'bd-action-blocks-v1';
+
+  const ACTION_BLOCK_SECTIONS = {
+    windows: {
+      title: 'Window management',
+      subtitle: 'Hyper = ⌘⌃⌥⇧',
+      items: [
+        { id: 'snap-left', label: 'Snap left', action: 'snap-left', keys: '⌘⌃⌥⇧←', terms: 'snap left' },
+        { id: 'snap-right', label: 'Snap right', action: 'snap-right', keys: '⌘⌃⌥⇧→', terms: 'snap right' },
+        { id: 'maximize', label: 'Maximize', action: 'maximize', keys: '⌘⌃⌥⇧↑', terms: 'maximize' },
+        { id: 'center', label: 'Center 80%', action: 'center', keys: '⌘⌃⌥⇧↓', terms: 'center' },
+      ],
+    },
+    tiler: {
+      title: 'Auto-tiler',
+      subtitle: 'per-display: ultrawide → equal columns, built-in → master + stack',
+      items: [
+        { id: 'tile-toggle', label: 'Toggle auto-tile', action: 'tile-toggle', keys: '⌘⌃T', terms: 'tile toggle auto' },
+        { id: 'tile-cycle', label: 'Cycle tiler mode (focused screen)', action: 'tile-cycle', keys: '⌘⌃L', terms: 'tile cycle mode columns stack' },
+      ],
+    },
+    layouts: {
+      title: 'Named layouts',
+      subtitle: 'full workspace mode: launch + position + hide others',
+      items: [
+        { id: 'layout-coding', label: 'Coding — Cursor + Ghostty', action: 'layout-apply', layout: 'coding', keys: '⌘⌃⇧1', terms: 'layout coding cursor ghostty' },
+        { id: 'layout-ai', label: 'AI Workflow — Cursor + ChatGPT Atlas + Ghostty (ultrawide)', action: 'layout-apply', layout: 'ai_workflow', keys: '⌘⌃⇧2', terms: 'layout ai workflow' },
+        { id: 'layout-ops', label: 'Ops Center — Ghostty 5-tab', action: 'layout-apply', layout: 'ops', keys: '⌘⌃⇧3', terms: 'layout ops ghostty' },
+        { id: 'layout-writing', label: 'Writing — Apple Notes + ChatGPT Atlas', action: 'layout-apply', layout: 'writing', keys: '⌘⌃⇧4', terms: 'layout writing notes' },
+        { id: 'layout-command', label: 'Command Center — ChatGPT Atlas + Cursor + Ghostty (AG493)', action: 'layout-apply', layout: 'command_center', keys: '⌘⌃⇧5', terms: 'layout command center ag493' },
+        { id: 'layout-dev', label: 'Dev Console — Cursor + Ghostty + HS Console', action: 'layout-apply', layout: 'dev_console', keys: '⌘⌃⇧6', terms: 'layout dev console' },
+      ],
+    },
+    launchers: {
+      title: 'App launchers',
+      subtitle: '⌘⌃ + number',
+      items: [
+        { id: 'launch-blackdragon', label: 'BlackDragon', action: 'launch', app: 'BlackDragon', keys: '⌘⌃1', terms: 'blackdragon' },
+        { id: 'launch-notes', label: 'Apple Notes', action: 'launch', app: 'Notes', keys: '⌘⌃2', terms: 'notes apple' },
+        { id: 'launch-cursor', label: 'Cursor', action: 'launch', app: 'Cursor', keys: '⌘⌃3', terms: 'cursor' },
+        { id: 'launch-iterm', label: 'iTerm', action: 'launch', app: 'iTerm', keys: '⌘⌃4', terms: 'iterm terminal' },
+        { id: 'launch-ghostty-ops', label: 'Ghostty Ops Center', action: 'terminal-ops', keys: '⌘⌃5', terms: 'ghostty ops terminal' },
+        { id: 'launch-unifi', label: 'UniFi Gateway (not installed)', keys: '⌘⌃6', terms: 'unifi cloud gateway not installed' },
+        { id: 'launch-ibkr', label: 'IBKR Desktop', action: 'launch', app: 'IBKR Desktop', keys: '⌘⌃7', terms: 'ibkr trading broker' },
+        { id: 'launch-codex', label: 'Codex', action: 'launch', app: 'Codex', keys: '⌘⌃8', terms: 'codex openai' },
+        { id: 'launch-claude', label: 'Claude', action: 'launch', app: 'Claude', keys: '⌘⌃9', terms: 'claude anthropic' },
+      ],
+    },
+    utilities: {
+      title: 'Utilities',
+      items: [
+        { id: 'util-clipboard', label: 'Clipboard history', action: 'clipboard', keys: '⌘⌃V', terms: 'clipboard' },
+        { id: 'util-reload', label: 'Reload config', action: 'reload', keys: '⌘⌃R', terms: 'reload' },
+        { id: 'util-guide', label: 'Open guide', action: 'open-guide', keys: '⌘⌃H', terms: 'guide' },
+      ],
+    },
+    openclaw: {
+      title: 'OpenClaw',
+      subtitle: '⌃⌥⌘ · local gateway on :18789',
+      items: [
+        { id: 'openclaw-ui', label: 'Control UI', keys: '⌃⌥⌘U', terms: 'openclaw control ui gateway' },
+        { id: 'openclaw-status', label: 'Gateway status', keys: '⌃⌥⌘I', terms: 'openclaw gateway status' },
+      ],
+    },
+    ai: {
+      title: 'AI workflow',
+      subtitle: '⌃⌥⌘ · select text first',
+      extraHtml: '<div class="action-panel"><h4>Live action panel</h4><p style="font-size:0.82rem;color:var(--muted);margin-bottom:0.5rem">Select text, click a button, refocus the source app within 2 seconds.</p><div id="action-status" class="empty">Waiting for action…</div></div>',
+      items: [
+        { id: 'ai-explain', label: 'Explain → ChatGPT', action: 'ai-explain', keys: '⌃⌥⌘G', terms: 'explain chatgpt' },
+        { id: 'ai-summary', label: 'Notes summary', action: 'ai-summary', keys: '⌃⌥⌘S', terms: 'summary notes' },
+        { id: 'ai-codex', label: 'Code review', action: 'ai-codex', keys: '⌃⌥⌘C', terms: 'codex review' },
+        { id: 'ai-snapshot', label: 'Project snapshot', action: 'ai-snapshot', keys: '⌃⌥⌘P', terms: 'snapshot' },
+        { id: 'ai-compare', label: 'AI compare (3 tabs)', action: 'ai-compare', keys: '⌃⌥⌘A', terms: 'compare ai' },
+        { id: 'ai-structured', label: 'Structured prompt', action: 'ai-structured', keys: '⌃⌥⌘R', terms: 'structured' },
+        { id: 'ai-deliver', label: 'Deliver prompt → Claude', action: 'ai-deliver', keys: '⌃⌥⌘D', terms: 'deliver prompt claude prompts.md' },
+        { id: 'ai-console', label: 'Hammerspoon Console', action: 'ai-console', keys: '⌃⌥⌘O', terms: 'hammerspoon console lua' },
+        { id: 'ai-quick', label: 'Quick commands', action: 'ai-quick', keys: '⌃⌥⌘Q', terms: 'quick command reload diagnostics' },
+      ],
+    },
+    'layouts-ag493': {
+      title: null,
+      items: [
+        { id: 'ag493-command', label: 'Command Center', action: 'layout-apply', layout: 'command_center', keys: '⌘⌃⇧5', terms: 'command center ag493' },
+        { id: 'ag493-dev', label: 'Dev Console', action: 'layout-apply', layout: 'dev_console', keys: '⌘⌃⇧6', terms: 'dev console' },
+      ],
+    },
+    'layouts-live': {
+      title: 'Layout quick actions',
+      items: [
+        { id: 'live-coding', label: 'Coding', action: 'layout-apply', layout: 'coding', keys: '⌘⌃⇧1', terms: 'coding' },
+        { id: 'live-ai', label: 'AI Workflow (ultrawide)', action: 'layout-apply', layout: 'ai_workflow', keys: '⌘⌃⇧2', terms: 'ai workflow' },
+        { id: 'live-ops', label: 'Ops Center', action: 'layout-apply', layout: 'ops', keys: '⌘⌃⇧3', terms: 'ops' },
+        { id: 'live-writing', label: 'Writing', action: 'layout-apply', layout: 'writing', keys: '⌘⌃⇧4', terms: 'writing' },
+        { id: 'live-command', label: 'Command Center', action: 'layout-apply', layout: 'command_center', keys: '⌘⌃⇧5', terms: 'command center' },
+        { id: 'live-dev', label: 'Dev Console', action: 'layout-apply', layout: 'dev_console', keys: '⌘⌃⇧6', terms: 'dev console' },
+        { id: 'live-tile', label: 'Toggle auto-tile', action: 'tile-toggle', keys: '⌘⌃T', terms: 'tile toggle' },
+        { id: 'live-verify', label: 'Verify setup', action: 'verify', keys: '▶', terms: 'verify displays' },
+      ],
+    },
+  };
+
+  let actionBlockState = JSON.parse(localStorage.getItem(ACTION_BLOCKS_KEY) || '{}');
+
+  function saveActionBlockState() {
+    localStorage.setItem(ACTION_BLOCKS_KEY, JSON.stringify(actionBlockState));
+  }
+
+  function getSectionState(sectionId) {
+    if (!actionBlockState[sectionId]) actionBlockState[sectionId] = { hidden: [], custom: [] };
+    return actionBlockState[sectionId];
+  }
+
+  function sectionItems(sectionId) {
+    const def = ACTION_BLOCK_SECTIONS[sectionId];
+    if (!def) return [];
+    const st = getSectionState(sectionId);
+    const hidden = new Set(st.hidden || []);
+    const defaults = def.items.filter(it => !hidden.has(it.id));
+    const custom = (st.custom || []).map((it, i) => ({ ...it, id: it.id || (sectionId + '-custom-' + i), custom: true }));
+    return defaults.concat(custom);
+  }
+
+  function itemButtonHtml(item, sectionId) {
+    const keys = item.keys ? '<div class="keys"><kbd>' + escapeHtml(item.keys) + '</kbd></div>' : '';
+    const inner =
+      '<span class="label">' + escapeHtml(item.label) + '</span>' + keys +
+      '<span class="item-remove" title="Remove from block" aria-label="Remove">×</span>';
+    const commonAttrs = [
+      'data-item-id="' + escapeHtml(item.id) + '"',
+      'data-block-section="' + escapeHtml(sectionId) + '"',
+      'data-terms="' + escapeHtml(item.terms || item.label || '') + '"',
+    ];
+    if (item.custom) commonAttrs.push('data-custom="1"');
+    if (!item.action) {
+      return '<div class="hotkey-item" ' + commonAttrs.join(' ') + '>' + inner + '</div>';
+    }
+    const attrs = [
+      'type="button"', 'class="hotkey-item actionable"',
+      'data-action="' + escapeHtml(item.action) + '"',
+    ].concat(commonAttrs);
+    if (item.app) attrs.push('data-app="' + escapeHtml(item.app) + '"');
+    if (item.path) attrs.push('data-path="' + escapeHtml(item.path) + '"');
+    if (item.layout) attrs.push('data-layout="' + escapeHtml(item.layout) + '"');
+    return '<button ' + attrs.join(' ') + '>' + inner + '</button>';
+  }
+
+  function addFormHtml(sectionId) {
+    return '<div class="block-add-form" id="add-form-' + sectionId + '">' +
+      '<div><label>Label</label><input type="text" class="add-label" placeholder="My App"></div>' +
+      '<div><label>Type</label><select class="add-type"><option value="launch">Launch app</option><option value="layout-apply">Apply layout</option><option value="snap-left">Snap left</option><option value="snap-right">Snap right</option><option value="maximize">Maximize</option><option value="center">Center 80%</option><option value="tile-toggle">Toggle auto-tile</option><option value="tile-cycle">Cycle tiler mode</option><option value="terminal-ops">Terminal Ops</option><option value="clipboard">Clipboard</option><option value="reload">Reload</option><option value="open-guide">Open guide</option><option value="verify">Verify</option><option value="ai-explain">AI: Explain</option><option value="ai-summary">AI: Summary</option><option value="ai-codex">AI: Code review</option><option value="ai-snapshot">AI: Snapshot</option><option value="ai-compare">AI: Compare</option><option value="ai-structured">AI: Structured</option></select></div>' +
+      '<div class="add-app-wrap"><label>App name</label><input type="text" class="add-app" placeholder="ChatGPT Atlas"></div>' +
+      '<div class="add-path-wrap" style="display:none"><label>.app path</label><input type="text" class="add-path" placeholder="/Applications/My.app"></div>' +
+      '<div class="add-layout-wrap" style="display:none"><label>Layout id</label><input type="text" class="add-layout" placeholder="coding"></div>' +
+      '<div><label>Hotkey label (display)</label><input type="text" class="add-keys" placeholder="⌘⌃8"></div>' +
+      '<div class="form-span-2"><button type="button" class="block-tool-btn add-save-btn">Save item</button></div>' +
+      '</div>';
+  }
+
+  function renderActionBlockSection(sectionId, mountEl, options) {
+    options = options || {};
+    const def = ACTION_BLOCK_SECTIONS[sectionId];
+    if (!def || !mountEl) return;
+    const items = sectionItems(sectionId);
+    const st = getSectionState(sectionId);
+    const hiddenCount = (st.hidden || []).length;
+
+    let head = '';
+    if (def.title) {
+      head = '<div class="action-block-head"><h3>' + escapeHtml(def.title);
+      if (def.subtitle) head += ' <span style="color:var(--muted);font-weight:400;font-size:0.8rem">— ' + escapeHtml(def.subtitle) + '</span>';
+      head += '</h3></div>';
+    }
+
+    const grid = items.map(it => itemButtonHtml(it, sectionId)).join('');
+    const tools = (!options.minimal ? (
+      '<div class="action-block-tools">' +
+      '<button type="button" class="block-tool-btn" data-block-add="' + sectionId + '">+ Add item</button>' +
+      (hiddenCount ? '<button type="button" class="block-tool-btn" data-block-restore="' + sectionId + '">Restore removed (' + hiddenCount + ')</button>' : '') +
+      '<button type="button" class="block-tool-btn" data-block-reset="' + sectionId + '">Reset block</button>' +
+      '</div>' + addFormHtml(sectionId)
+    ) : (
+      '<div class="action-block-tools">' +
+      '<button type="button" class="block-tool-btn" data-block-add="' + sectionId + '">+ Add</button>' +
+      '<button type="button" class="block-tool-btn" data-block-reset="' + sectionId + '">Reset</button>' +
+      '</div>' + addFormHtml(sectionId)
+    ));
+
+    if (options.gridOnly) {
+      mountEl.innerHTML = grid + tools;
+      return;
+    }
+
+    mountEl.innerHTML = '<section class="action-block-section" data-section="' + sectionId + '">' +
+      head + (def.extraHtml || '') +
+      '<div class="hotkey-grid">' + grid + '</div>' + tools + '</section>';
+  }
+
+  function renderAllActionBlocks() {
+    const hkRoot = document.getElementById('hotkey-blocks-root');
+    if (hkRoot) {
+      hkRoot.innerHTML = '';
+      ['windows', 'tiler', 'layouts', 'launchers', 'utilities', 'openclaw', 'ai'].forEach(id => {
+        const mount = document.createElement('div');
+        hkRoot.appendChild(mount);
+        renderActionBlockSection(id, mount);
+      });
+    }
+    const ag493 = document.getElementById('block-layouts-ag493');
+    if (ag493) renderActionBlockSection('layouts-ag493', ag493, { gridOnly: true, minimal: true });
+    const layoutsRoot = document.getElementById('layouts-blocks-root');
+    if (layoutsRoot) {
+      layoutsRoot.innerHTML = '';
+      const mount = document.createElement('div');
+      layoutsRoot.appendChild(mount);
+      renderActionBlockSection('layouts-live', mount);
+    }
+  }
+
+  function initActionBlocks() {
+    renderAllActionBlocks();
+
+    document.body.addEventListener('click', e => {
+      const removeBtn = e.target.closest('.item-remove');
+      if (removeBtn) {
+        e.stopPropagation();
+        e.preventDefault();
+        const btn = removeBtn.closest('.hotkey-item');
+        const sectionId = btn?.dataset.blockSection;
+        const itemId = btn?.dataset.itemId;
+        if (!sectionId || !itemId) return;
+        const st = getSectionState(sectionId);
+        if (btn.dataset.custom === '1' || (itemId && itemId.startsWith('custom-'))) {
+          st.custom = (st.custom || []).filter(it => it.id !== itemId);
+        } else if (!st.hidden.includes(itemId)) {
+          st.hidden.push(itemId);
+        }
+        saveActionBlockState();
+        renderAllActionBlocks();
+        return;
+      }
+
+      const addBtn = e.target.closest('[data-block-add]');
+      if (addBtn) {
+        const form = document.getElementById('add-form-' + addBtn.dataset.blockAdd);
+        form?.classList.toggle('open');
+        return;
+      }
+
+      const restoreBtn = e.target.closest('[data-block-restore]');
+      if (restoreBtn) {
+        const sectionId = restoreBtn.dataset.blockRestore;
+        const st = getSectionState(sectionId);
+        st.hidden = [];
+        saveActionBlockState();
+        renderAllActionBlocks();
+        showToast('Restored removed items');
+        return;
+      }
+
+      const resetBtn = e.target.closest('[data-block-reset]');
+      if (resetBtn) {
+        const sectionId = resetBtn.dataset.blockReset;
+        delete actionBlockState[sectionId];
+        saveActionBlockState();
+        renderAllActionBlocks();
+        showToast('Block reset to defaults');
+        return;
+      }
+
+      const saveBtn = e.target.closest('.add-save-btn');
+      if (saveBtn) {
+        const form = saveBtn.closest('.block-add-form');
+        const sectionId = form?.id?.replace('add-form-', '');
+        if (!sectionId) return;
+        const label = form.querySelector('.add-label')?.value.trim();
+        const type = form.querySelector('.add-type')?.value;
+        const app = form.querySelector('.add-app')?.value.trim();
+        const path = form.querySelector('.add-path')?.value.trim();
+        const keys = form.querySelector('.add-keys')?.value.trim() || '▶';
+        if (!label) { showToast('Label required'); return; }
+        let action = type;
+        let item = { id: 'custom-' + Date.now(), label, action, keys, terms: label.toLowerCase(), custom: true };
+        if (type === 'launch') {
+          item.action = 'launch';
+          item.app = app || label;
+        } else if (type === 'layout-apply') {
+          const layout = form.querySelector('.add-layout')?.value.trim();
+          if (!layout) { showToast('Layout id required'); return; }
+          item.action = 'layout-apply';
+          item.layout = layout;
+        } else {
+          item.action = type;
+        }
+        const st = getSectionState(sectionId);
+        st.custom = st.custom || [];
+        st.custom.push(item);
+        saveActionBlockState();
+        form.classList.remove('open');
+        form.querySelector('.add-label').value = '';
+        form.querySelector('.add-app').value = '';
+        form.querySelector('.add-path').value = '';
+        form.querySelector('.add-keys').value = '';
+        renderAllActionBlocks();
+        showToast('Item added');
+        return;
+      }
+
+      const hotkeyBtn = e.target.closest('button.hotkey-item.actionable');
+      if (hotkeyBtn && !e.target.closest('.item-remove')) {
+        runHotkeyAction(hotkeyBtn);
+      }
+    });
+
+    document.body.addEventListener('change', e => {
+      if (e.target.classList.contains('add-type')) {
+        const form = e.target.closest('.block-add-form');
+        const val = e.target.value;
+        const isLayout = val === 'layout-apply';
+        const isLaunch = val === 'launch';
+        form.querySelector('.add-app-wrap').style.display = isLaunch ? 'block' : 'none';
+        form.querySelector('.add-path-wrap').style.display = 'none';
+        form.querySelector('.add-layout-wrap').style.display = isLayout ? 'block' : 'none';
+      }
+    });
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('action-toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  function fireURL(url, label) {
+    showToast('▶ ' + label);
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = url;
+    document.body.appendChild(iframe);
+    setTimeout(() => iframe.remove(), 1000);
+  }
+
+  function runAction(el) {
+    const label = el.textContent.replace(/▶\s*/, '').trim();
+    fireURL(buildGuideURL(el), label);
+  }
+
+  function runHotkeyAction(btn) {
+    const label = btn.querySelector('.label')?.textContent || btn.textContent.trim();
+    const url = buildGuideURL(btn);
+    const needsSelection = btn.dataset.action?.startsWith('ai-') && btn.dataset.action !== 'ai-snapshot';
+    btn.classList.add('pressed');
+    setTimeout(() => btn.classList.remove('pressed'), 350);
+    const status = document.getElementById('action-status');
+    if (status) { status.classList.remove('empty'); status.textContent = '▶ ' + label; }
+    if (needsSelection) {
+      let sec = 2;
+      showToast('Refocus source app — capturing in ' + sec + 's…');
+      const iv = setInterval(() => {
+        sec--;
+        if (sec > 0) showToast('Refocus source app — capturing in ' + sec + 's…');
+        else { clearInterval(iv); fireURL(url, label); }
+      }, 1000);
+    } else {
+      fireURL(url, label);
+    }
+  }
+
+  document.querySelectorAll('button.hotkey-item.actionable').forEach(btn => {
+    if (!btn.closest('#hotkey-blocks-root, #layouts-blocks-root, #block-layouts-ag493')) {
+      btn.addEventListener('click', () => runHotkeyAction(btn));
+    }
+  });
+
+  function switchTab(tabId) {
+    document.querySelectorAll('nav.tabs button').forEach(b => b.classList.toggle('active', b.dataset.tab === tabId));
+    document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.id === tabId));
+  }
+  document.querySelectorAll('nav.tabs button').forEach(btn => {
+    btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+  });
+
+  function toggleExample(id) { document.getElementById(id).classList.toggle('open'); }
+
+  function copyCode(btn) {
+    const pre = btn.parentElement.querySelector('pre');
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1800);
+    });
+  }
+
+  document.getElementById('hotkey-search')?.addEventListener('input', e => {
+    const q = e.target.value.toLowerCase();
+    document.querySelectorAll('.hotkey-item').forEach(item => {
+      const terms = (item.dataset.terms || '') + ' ' + item.textContent.toLowerCase();
+      item.classList.toggle('hidden', q.length > 0 && !terms.includes(q));
+    });
+  });
+
+  function simLayout(action) {
+    const left = document.getElementById('pane-left');
+    const right = document.getElementById('pane-right');
+    const out = document.getElementById('layout-output');
+    out.classList.remove('empty');
+    if (action === 'reset') {
+      left.textContent = right.textContent = 'empty';
+      left.style.background = right.style.background = 'var(--surface2)';
+      out.textContent = '↺ Reset';
+      return;
+    }
+    if (action === 'cursor-left') {
+      left.textContent = 'Cursor'; left.style.background = 'rgba(91,156,255,0.25)';
+      out.textContent = '✅ Cursor → snap left';
+    }
+    if (action === 'terminal-right') {
+      right.textContent = 'iTerm'; right.style.background = 'rgba(52,211,153,0.2)';
+      out.textContent = '✅ iTerm → snap right';
+    }
+  }
+
+  function simWebhook(method) {
+    const path = 'hs/daily-log';
+    const out = document.getElementById('webhook-output');
+    out.classList.remove('empty');
+    const url = 'http://localhost:5678/webhook/' + path;
+    if (method === 'get') out.textContent = '→ GET ' + url + ' (simulated ✅)';
+    else out.textContent = '→ POST ' + url + ' ' + JSON.stringify({source:'guide'}) + ' (simulated ✅)';
+  }
+
+  function simAI(mode) {
+    const sel = document.getElementById('ai-selection').value.trim();
+    const out = document.getElementById('ai-output');
+    out.classList.remove('empty');
+    if (!sel) { out.textContent = '⚠️ No text'; return; }
+    if (mode === 'explain') out.textContent = '📋 Explain prompt:\n\nPlease explain the following in simple, plain English:\n\n' + sel;
+    else if (mode === 'codex') out.textContent = '📋 Code review prompt ready (ChatGPT)';
+    else out.textContent = '📋 Structured prompt ready';
+  }
+
+  const snippets = {
+    layouts: "local layouts = require('modules.layouts')\nlayouts.apply('coding')\nlayouts.dumpScreen()\nrequire('modules.verify').run()",
+    n8n: "local n8n = require('modules.n8n')\nn8n.trigger('hs/daily-log')\nn8n.post('hs/daily-log', { source = 'guide' })",
+    applescript: "hs.osascript.applescript([[\n  tell application \"Ghostty\" to activate\n]])",
+    km: "hs.urlevent.openURL('kmtrigger://macro=MyMacro')",
+    notify: "hs.notify.new({title='Done', informativeText='Task complete'}):send()",
+    mqtt: "local c = hs.mqtt.new('tcp://localhost:1883')\nc:connect('hs-client')\nc:publish('home/lights', 'on')",
+    websocket: "hs.websocket.new('ws://localhost:8080/ws', {\n  onMessage = function(_, m) hs.alert.show(m) end\n})",
+    shortcuts: "hs.execute(\"open 'shortcuts://run-shortcut?name=Start Dev Day'\")"
+  };
+  document.querySelectorAll('#integrations-table tr[data-snippet]').forEach(row => {
+    row.addEventListener('click', () => {
+      document.getElementById('integration-code').textContent = snippets[row.dataset.snippet];
+    });
+  });
+  document.getElementById('integration-code').textContent = snippets.n8n;
+
+  function runConsoleCmd() {
+    const cmd = document.getElementById('console-cmd').value;
+    const out = document.getElementById('console-output');
+    navigator.clipboard.writeText(cmd).then(() => {
+      out.classList.remove('empty');
+      out.textContent = '📋 Copied — paste in Hammerspoon Console:\n→ ' + cmd;
+    });
+  }
+
+  // Setup checklist persistence
+  const CK = 'bd-guide-checklist';
+  const saved = JSON.parse(localStorage.getItem(CK) || '{}');
+  document.querySelectorAll('#setup-checklist li').forEach(li => {
+    const id = li.dataset.id;
+    const cb = li.querySelector('input');
+    if (saved[id]) { cb.checked = true; li.classList.add('done'); }
+    cb.addEventListener('change', () => {
+      saved[id] = cb.checked;
+      li.classList.toggle('done', cb.checked);
+      localStorage.setItem(CK, JSON.stringify(saved));
+    });
+  });
+</script>
+</body>
+</html>

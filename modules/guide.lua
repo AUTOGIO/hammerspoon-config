@@ -10,13 +10,31 @@ local ai           = require('modules.ai')
 local terminal_ops = require('modules.terminal_ops')
 local layouts      = require('modules.layouts')
 
-local guidePath = os.getenv('HOME') .. '/.hammerspoon/USER_GUIDE.html'
+local guidePath = os.getenv('HOME') .. '/.hammerspoon/docs/USER_GUIDE.html'
+
+-- Mirror operations_console + hotkeys / USER_GUIDE launch catalog
+local allowedLaunchApps = {
+  BlackDragon = true,
+  Notes = true,
+  Cursor = true,
+  iTerm = true,
+  iTerm2 = true,
+  Ghostty = true,
+  Claude = true,
+  Codex = true,
+  ['ChatGPT Atlas'] = true,
+  Obsidian = true,
+  Hammerspoon = true,
+  ['IBKR Desktop'] = true,
+}
 
 function M.open()
-  hs.execute("open '" .. guidePath .. "'")
+  if not apps.openWithMainBrowser(guidePath) then
+    hs.execute("open '" .. guidePath:gsub("'", "'\\''") .. "'")
+  end
 end
 
-local function run(params)
+local function run(_eventName, params)
   local action = params and params.action
   if not action or action == '' then
     hs.alert.show('⚠ guide: action required')
@@ -33,7 +51,16 @@ local function run(params)
   if action == 'open-guide'   then M.open(); return end
 
   if action == 'launch' then
-    apps.launch(params.app or '')
+    if params.path and params.path ~= '' then
+      hs.alert.show('⚠ guide: launch requires allowlisted app name')
+      return
+    end
+    local name = params.app or params.name
+    if not name or name == '' or not allowedLaunchApps[name] or name:find('/') then
+      hs.alert.show('⚠ guide: launch requires allowlisted app name')
+      return
+    end
+    apps.launch(name)
     return
   end
 
@@ -76,7 +103,7 @@ local function run(params)
   hs.alert.show('⚠ guide: unknown action — ' .. action)
 end
 
-hs.urlevent.bind('guide', 'run', run)
+hs.urlevent.bind('guide', run)
 
 hs.hotkey.bind({'cmd', 'ctrl'}, 'h', M.open)
 
