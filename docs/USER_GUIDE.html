@@ -552,6 +552,18 @@
     .ops-check-FAIL { color: var(--red); }
     .ops-check-WARNING { color: var(--amber); }
     .ops-suite-issues { margin: 0.4rem 0 0; padding-left: 1.1rem; font-size: 0.85rem; color: var(--muted); }
+    .ops-suite-subchecks {
+      list-style: none; margin: 0.15rem 0 0.25rem 0; padding: 0 0 0 0.75rem;
+      border-left: 2px solid color-mix(in srgb, var(--border) 80%, transparent);
+      font-size: 0.74rem;
+    }
+    .ops-suite-subchecks li {
+      display: grid;
+      grid-template-columns: 5.5rem 1fr;
+      gap: 0.35rem;
+      padding: 0.12rem 0;
+      color: var(--muted);
+    }
 
     .ops-insight-grid {
       display: grid;
@@ -2015,7 +2027,13 @@ require('modules.windows').toggleAutoTile()</pre>
     if (!suite || !Array.isArray(suite.checks)) return '';
     const checks = suite.checks.map(c => {
       const result = c.result || '?';
-      return `<li><span class="ops-check-${escapeHtml(result)}">${escapeHtml(result)}</span><span>${escapeHtml(c.id || '')} — ${escapeHtml(c.detail || '')}</span></li>`;
+      const subs = Array.isArray(c.subchecks) && c.subchecks.length
+        ? `<ul class="ops-suite-subchecks">${c.subchecks.map(s => {
+            const sr = s.result || '?';
+            return `<li><span class="ops-check-${escapeHtml(sr)}">${escapeHtml(sr)}</span><span>${escapeHtml(s.id || '')} — ${escapeHtml(s.detail || '')}</span></li>`;
+          }).join('')}</ul>`
+        : '';
+      return `<li><span class="ops-check-${escapeHtml(result)}">${escapeHtml(result)}</span><span>${escapeHtml(c.id || '')} — ${escapeHtml(c.detail || '')}${subs}</span></li>`;
     }).join('');
     const issues = Array.isArray(suite.issues) && suite.issues.length
       ? `<ul class="ops-suite-issues">${suite.issues.map(i => `<li>${escapeHtml(i.result || '')}: ${escapeHtml(i.id || '')} — ${escapeHtml(i.detail || '')}</li>`).join('')}</ul>`

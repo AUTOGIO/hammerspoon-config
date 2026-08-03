@@ -18,7 +18,7 @@ modules (layouts, verify, diagnostics, insight, guide, …)
 Browser actions use a **separate** URL scheme from the legacy guide bridge:
 
 ```text
-hammerspoon://operations/run?action=<allowlisted_action>
+hammerspoon://operations?action=<allowlisted_action>
 ```
 
 Existing guide buttons continue to use:
@@ -56,11 +56,13 @@ Top-level fields:
 - `clipboard` — `{ history_count, watcher_alive }`
 - `diagnostics` — last `run_diagnostics` payload (`at`, `score`, `pass`, `fail`, `warn`, `checks[]`)
 - `environment` — last `run_environment_audit` payload (+ `issues[]`)
-- `verification` — last `run_full_self_test` payload
+- `verification` — last `run_full_self_test` payload (`checks[]` may include `subchecks` for `layout_suite`; `issues[]` lists non-PASS items including `layout:<id>`)
 - `system` — thin host metrics from `insight.hostMetrics()` (CPU/mem/battery/load; refreshed each status write)
 - `hotkeys` — last `run_hotkey_scan` payload (HS-only inventory + duplicate chords)
 - `metrics` — last `run_perf_probes` payload (`probes[]` with timings)
 - `diagnostics_text` — copy-ready summary
+
+Single-display topology: missing ultrawide or built-in is a **WARNING**, not FAIL (laptop-only or ultrawide-only setups). With 2+ displays, missing either role remains FAIL.
 
 Individual check failures do not abort the full refresh.
 
@@ -81,7 +83,7 @@ Scoring rule: Hammerspoon, accessibility, Ghostty config/runtime, project path, 
 | `run_verification` | `verify.run()` layout/display suite |
 | `run_diagnostics` | `diagnostics.runDiagnostics()` → `status.diagnostics` |
 | `run_environment_audit` | `diagnostics.runEnvironmentAudit()` → `status.environment` |
-| `run_full_self_test` | `verify.runFull()` → `status.verification` |
+| `run_full_self_test` | `verify.runFull()` → `status.verification` (includes `layout_suite.subchecks` + `issues[]`) |
 | `run_hotkey_scan` | `insight.scanHotkeys()` → `status.hotkeys` (HS duplicates only) |
 | `run_perf_probes` | `insight.runPerfProbes()` → `status.metrics` |
 | `backup_configuration` | Dated archive under `~/.hammerspoon/backups/ops-YYYYMMDD-HHMMSS/` |
@@ -137,7 +139,7 @@ Severity: `info`, `success`, `warning`, `error`.
 |---------|--------|
 | Status stuck at UNKNOWN | Reload Hammerspoon (`⌘⌃R`); confirm `init.lua` loads `operations_console` |
 | `fetch` failed in browser | Use Safari or same-folder `file://` open; reload Hammerspoon to regenerate JSON |
-| Action does nothing | Hammerspoon menu → Console for errors; confirm URL is `operations/run` |
+| Action does nothing | Hammerspoon menu → Console for errors; confirm URL is `hammerspoon://operations?action=…` |
 | Ghostty degraded | Install Ghostty, grant Automation permission |
 | Ollama/n8n unreachable | Start manually; console does not auto-start services |
 | Rapid duplicate start events | Path watcher reload loop — avoid editing `~/.hammerspoon` while testing |
