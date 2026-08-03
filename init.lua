@@ -38,4 +38,4 @@ hs.pathwatcher.new(configDir, function(files)
   end)
 end):start()
 
-hs.alert.show('WE ARE READY, MOTHER FUCKER')
+hs.alert.show('WE ARE READY, MOTHER FUCKER, WE ARE REEEADY TO ROCK AND ROLL')
